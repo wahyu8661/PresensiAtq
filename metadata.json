@@ -1,0 +1,6 @@
+{
+  "name": "Sistem Presensi Attaufiq",
+  "description": "Aplikasi Sistem Presensi Sekolah Islam Attaufiq dengan peran Admin, Wali Kelas, dan Guru Mapel serta dukungan Impor/Ekspor Excel.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
