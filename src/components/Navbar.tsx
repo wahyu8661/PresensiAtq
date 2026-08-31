@@ -15,6 +15,7 @@ import {
   Menu,
   X,
   Layers,
+  Settings,
 } from 'lucide-react';
 
 interface NavbarProps {
@@ -119,6 +120,12 @@ export const Navbar: React.FC<NavbarProps> = ({
             { id: 'kelola_kelas', label: 'Kelola Kelas & Rombel', icon: <Layers className="w-4 h-4" /> },
           ],
         },
+        {
+          group: 'Akun & Profil',
+          items: [
+            { id: 'pengaturan_akun', label: 'Pengaturan Akun & Profil', icon: <Settings className="w-4 h-4" /> },
+          ],
+        },
       ];
     } else if (currentUser.role === 'wali_kelas') {
       return [
@@ -134,6 +141,12 @@ export const Navbar: React.FC<NavbarProps> = ({
             { id: 'rekap_presensi', label: 'Download Data Presensi', icon: <FileSpreadsheet className="w-4 h-4" /> },
           ],
         },
+        {
+          group: 'Akun & Profil',
+          items: [
+            { id: 'pengaturan_akun', label: 'Pengaturan Akun & Profil', icon: <Settings className="w-4 h-4" /> },
+          ],
+        },
       ];
     } else {
       // Guru Mapel
@@ -144,6 +157,12 @@ export const Navbar: React.FC<NavbarProps> = ({
             { id: 'guru_dashboard', label: 'Jadwal & Presensi Mapel', icon: <BookOpen className="w-4 h-4" /> },
             { id: 'input_presensi', label: 'Presensi Jam Mapel', icon: <UserCheck className="w-4 h-4" /> },
             { id: 'rekap_presensi', label: 'Riwayat & Rekap Mapel', icon: <FileSpreadsheet className="w-4 h-4" /> },
+          ],
+        },
+        {
+          group: 'Akun & Profil',
+          items: [
+            { id: 'pengaturan_akun', label: 'Pengaturan Akun & Profil', icon: <Settings className="w-4 h-4" /> },
           ],
         },
       ];
@@ -241,24 +260,48 @@ export const Navbar: React.FC<NavbarProps> = ({
         {/* User Profile & Logout Footer */}
         <div className="p-3 bg-slate-950 border-t border-slate-800">
           <div className="flex items-center justify-between gap-2 p-2 rounded-xl bg-slate-900 border border-slate-800">
-            <div className="flex items-center gap-2.5 min-w-0">
-              <div className="w-8 h-8 rounded-full bg-[#1b357f] text-white flex items-center justify-center font-bold text-xs shrink-0 shadow-xs">
-                {currentUser.name.slice(0, 2).toUpperCase()}
+            <button
+              type="button"
+              onClick={() => onSelectTab('pengaturan_akun')}
+              className="flex items-center gap-2.5 min-w-0 text-left hover:opacity-90 transition-opacity cursor-pointer flex-1"
+              title="Buka Pengaturan Akun & Profil"
+            >
+              <div className="w-8 h-8 rounded-full overflow-hidden bg-[#1b357f] text-white flex items-center justify-center font-bold text-xs shrink-0 shadow-xs ring-1 ring-white/10">
+                {currentUser.avatar ? (
+                  <img src={currentUser.avatar} alt={currentUser.name} className="w-full h-full object-cover" />
+                ) : (
+                  currentUser.name.slice(0, 2).toUpperCase()
+                )}
               </div>
-              <div className="min-w-0">
+              <div className="min-w-0 flex-1">
                 <div className="text-xs font-bold text-slate-200 truncate">{currentUser.name}</div>
                 <div className="text-[10px] text-slate-400 truncate">{roleBadge.label}</div>
               </div>
-            </div>
-            <button
-              type="button"
-              id="sidebar-logout-btn"
-              onClick={onLogout}
-              title="Keluar / Logout"
-              className="p-1.5 text-slate-400 hover:text-rose-400 hover:bg-slate-800 rounded-lg transition-colors cursor-pointer"
-            >
-              <LogOut className="w-4 h-4" />
             </button>
+            <div className="flex items-center gap-0.5 shrink-0">
+              <button
+                type="button"
+                id="sidebar-settings-btn"
+                onClick={() => onSelectTab('pengaturan_akun')}
+                title="Pengaturan Akun"
+                className={`p-1.5 rounded-lg transition-colors cursor-pointer ${
+                  activeTab === 'pengaturan_akun'
+                    ? 'text-blue-400 bg-slate-800'
+                    : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800'
+                }`}
+              >
+                <Settings className="w-4 h-4" />
+              </button>
+              <button
+                type="button"
+                id="sidebar-logout-btn"
+                onClick={onLogout}
+                title="Keluar / Logout"
+                className="p-1.5 text-slate-400 hover:text-rose-400 hover:bg-slate-800 rounded-lg transition-colors cursor-pointer"
+              >
+                <LogOut className="w-4 h-4" />
+              </button>
+            </div>
           </div>
         </div>
       </aside>
@@ -347,23 +390,47 @@ export const Navbar: React.FC<NavbarProps> = ({
 
             <div className="p-3 bg-slate-950 border-t border-slate-800">
               <div className="flex items-center justify-between gap-2 p-2 rounded-xl bg-slate-900 border border-slate-800">
-                <div className="flex items-center gap-2.5 min-w-0">
-                  <div className="w-8 h-8 rounded-full bg-[#1b357f] text-white flex items-center justify-center font-bold text-xs shrink-0">
-                    {currentUser.name.slice(0, 2).toUpperCase()}
+                <button
+                  type="button"
+                  onClick={() => {
+                    onSelectTab('pengaturan_akun');
+                    setIsMobileMenuOpen(false);
+                  }}
+                  className="flex items-center gap-2.5 min-w-0 text-left flex-1"
+                >
+                  <div className="w-8 h-8 rounded-full overflow-hidden bg-[#1b357f] text-white flex items-center justify-center font-bold text-xs shrink-0 ring-1 ring-white/10">
+                    {currentUser.avatar ? (
+                      <img src={currentUser.avatar} alt={currentUser.name} className="w-full h-full object-cover" />
+                    ) : (
+                      currentUser.name.slice(0, 2).toUpperCase()
+                    )}
                   </div>
-                  <div className="min-w-0">
+                  <div className="min-w-0 flex-1">
                     <div className="text-xs font-bold text-slate-200 truncate">{currentUser.name}</div>
                     <div className="text-[10px] text-slate-400 truncate">{roleBadge.label}</div>
                   </div>
-                </div>
-                <button
-                  type="button"
-                  onClick={onLogout}
-                  className="p-1.5 text-slate-400 hover:text-rose-400 rounded-lg"
-                  title="Keluar"
-                >
-                  <LogOut className="w-4 h-4" />
                 </button>
+                <div className="flex items-center gap-0.5">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      onSelectTab('pengaturan_akun');
+                      setIsMobileMenuOpen(false);
+                    }}
+                    className="p-1.5 text-slate-400 hover:text-blue-400 rounded-lg"
+                    title="Pengaturan"
+                  >
+                    <Settings className="w-4 h-4" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={onLogout}
+                    className="p-1.5 text-slate-400 hover:text-rose-400 rounded-lg"
+                    title="Keluar"
+                  >
+                    <LogOut className="w-4 h-4" />
+                  </button>
+                </div>
               </div>
             </div>
           </aside>
@@ -395,8 +462,8 @@ export const Navbar: React.FC<NavbarProps> = ({
             </div>
           </div>
 
-          {/* Right Side: Live Clock, Profile Pill & Logout Button */}
-          <div className="flex items-center gap-2.5 sm:gap-4">
+          {/* Right Side: Live Clock, Profile Pill, Settings & Logout Button */}
+          <div className="flex items-center gap-2 sm:gap-3">
             {/* Live Date & Time Badge */}
             <div className="hidden lg:flex items-center gap-2 text-xs bg-slate-50 border border-slate-200 px-3 py-1.5 rounded-xl text-slate-600">
               <span className="flex items-center gap-1.5 font-medium">
@@ -410,16 +477,46 @@ export const Navbar: React.FC<NavbarProps> = ({
               </span>
             </div>
 
-            {/* Profile Info Badge */}
-            <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-50 border border-slate-200 text-xs font-semibold text-slate-700">
-              <div className="w-6 h-6 rounded-full bg-[#1b357f] text-white flex items-center justify-center text-[10px] font-bold">
-                {currentUser.name.slice(0, 2).toUpperCase()}
+            {/* Profile Info Badge (Clickable to open settings) */}
+            <button
+              type="button"
+              id="topbar-profile-pill"
+              onClick={() => onSelectTab('pengaturan_akun')}
+              title="Klik untuk membuka Pengaturan Akun & Profil"
+              className={`flex items-center gap-2 px-2.5 sm:px-3 py-1.5 rounded-xl border text-xs font-semibold transition-all cursor-pointer ${
+                activeTab === 'pengaturan_akun'
+                  ? 'bg-blue-50 border-blue-300 text-blue-900 ring-2 ring-blue-400/20'
+                  : 'bg-slate-50 hover:bg-slate-100 border-slate-200 text-slate-700'
+              }`}
+            >
+              <div className="w-6 h-6 rounded-full overflow-hidden bg-[#1b357f] text-white flex items-center justify-center text-[10px] font-bold shrink-0">
+                {currentUser.avatar ? (
+                  <img src={currentUser.avatar} alt={currentUser.name} className="w-full h-full object-cover" />
+                ) : (
+                  currentUser.name.slice(0, 2).toUpperCase()
+                )}
               </div>
               <div className="hidden sm:block text-left">
-                <div className="leading-tight font-bold text-slate-800 truncate max-w-[140px]">{currentUser.name}</div>
+                <div className="leading-tight font-bold text-slate-800 truncate max-w-[130px]">{currentUser.name}</div>
                 <div className="text-[10px] text-slate-500 leading-tight">{roleBadge.label}</div>
               </div>
-            </div>
+            </button>
+
+            {/* Settings Button */}
+            <button
+              type="button"
+              id="topbar-settings-btn"
+              onClick={() => onSelectTab('pengaturan_akun')}
+              title="Pengaturan Akun & Keamanan"
+              className={`p-2 rounded-xl border text-xs font-bold transition-all cursor-pointer active:scale-95 flex items-center gap-1.5 ${
+                activeTab === 'pengaturan_akun'
+                  ? 'bg-blue-600 border-blue-600 text-white shadow-xs'
+                  : 'bg-slate-50 hover:bg-slate-100 border-slate-200 text-slate-700'
+              }`}
+            >
+              <Settings className="w-4 h-4" />
+              <span className="hidden md:inline">Pengaturan</span>
+            </button>
 
             {/* Logout Button */}
             <button

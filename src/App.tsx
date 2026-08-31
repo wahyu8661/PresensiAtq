@@ -33,6 +33,7 @@ import { AdminDashboard } from './components/AdminDashboard';
 import { AttendanceReportsView } from './components/AttendanceReportsView';
 import { ImportModal } from './components/ImportModal';
 import { StudentDetailModal } from './components/StudentDetailModal';
+import { UserSettingsView } from './components/UserSettingsView';
 
 export default function App() {
   // Master persistent state
@@ -144,6 +145,15 @@ export default function App() {
       }
       return [...prev, user];
     });
+    // If the saved user is the currently logged in user, keep session in sync
+    if (currentUser && currentUser.id === user.id) {
+      setCurrentUser(user);
+    }
+  };
+
+  // Handler for user personal settings update
+  const handleSaveUserProfile = (updatedUser: User) => {
+    handleSaveUser(updatedUser);
   };
 
   // Handler to Delete User
@@ -269,6 +279,16 @@ export default function App() {
             records={records}
             defaultClassId={currentUser.role === 'wali_kelas' ? currentUser.assignedClassId : undefined}
             onViewStudentDetail={(student) => setSelectedStudentForDetail(student)}
+          />
+        )}
+
+        {/* TAB: PENGATURAN AKUN & PROFIL (Ganti Foto, Identitas & Password) */}
+        {activeTab === 'pengaturan_akun' && (
+          <UserSettingsView
+            currentUser={currentUser}
+            classes={classes}
+            subjects={subjects}
+            onSaveProfile={handleSaveUserProfile}
           />
         )}
 

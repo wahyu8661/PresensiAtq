@@ -29,6 +29,12 @@ import {
   UserPlus,
   Check,
   UserCheck,
+  Camera,
+  Key,
+  Eye,
+  EyeOff,
+  Lock,
+  RefreshCw,
 } from 'lucide-react';
 
 interface AdminDashboardProps {
@@ -88,6 +94,9 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   const [userRoleFilter, setUserRoleFilter] = useState<string>('ALL');
   const [editingUser, setEditingUser] = useState<User | null>(null);
   const [isUserModalOpen, setIsUserModalOpen] = useState<boolean>(false);
+  const [userModalAvatar, setUserModalAvatar] = useState<string | undefined>(undefined);
+  const [userModalPassword, setUserModalPassword] = useState<string>('123');
+  const [showUserModalPassword, setShowUserModalPassword] = useState<boolean>(false);
 
   // Multi-position state inside Add/Edit User Form
   const [selectedRoles, setSelectedRoles] = useState<UserRole[]>(['guru_mapel']);
@@ -167,6 +176,9 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   const handleOpenUserModal = (userToEdit?: User) => {
     if (userToEdit) {
       setEditingUser(userToEdit);
+      setUserModalAvatar(userToEdit.avatar);
+      setUserModalPassword(userToEdit.password || '123');
+      setShowUserModalPassword(false);
       const r = userToEdit.roles && userToEdit.roles.length > 0 ? userToEdit.roles : [userToEdit.role];
       setSelectedRoles(r);
       setAssignedClassForWali(userToEdit.assignedClassId || '');
@@ -174,12 +186,75 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
       setSelectedClassIdsForGuru(userToEdit.assignedClassIds || classes.map((c) => c.id));
     } else {
       setEditingUser(null);
+      setUserModalAvatar(undefined);
+      setUserModalPassword('123');
+      setShowUserModalPassword(false);
       setSelectedRoles(['guru_mapel']);
       setAssignedClassForWali(classes[0]?.id || '');
       setSelectedSubjectIdsForGuru(['matematika']);
       setSelectedClassIdsForGuru(classes.map((c) => c.id));
     }
     setIsUserModalOpen(true);
+  };
+
+  // Quick 1-click Reset Password by Admin
+  const handleQuickResetPassword = (userToReset: User) => {
+    const confirmReset = window.confirm(
+      `Reset kata sandi untuk akun "${userToReset.name}" (@${userToReset.username}) ke default "123"?`
+    );
+    if (!confirmReset) return;
+
+    const updated: User = {
+      ...userToReset,
+      password: '123',
+    };
+    onSaveUser(updated);
+    alert(`Kata sandi untuk ${userToReset.name} berhasil di-reset menjadi "123".`);
+  };
+
+  // Handle Photo File Upload in Admin User Modal
+  const handleAdminAvatarUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      alert('Harap pilih file gambar (JPG, PNG, atau WEBP).');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        const MAX_SIZE = 256;
+        let width = img.width;
+        let height = img.height;
+
+        if (width > height) {
+          if (width > MAX_SIZE) {
+            height = Math.round((height * MAX_SIZE) / width);
+            width = MAX_SIZE;
+          }
+        } else {
+          if (height > MAX_SIZE) {
+            width = Math.round((width * MAX_SIZE) / height);
+            height = MAX_SIZE;
+          }
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        if (ctx) {
+          ctx.drawImage(img, 0, 0, width, height);
+          const compressed = canvas.toDataURL('image/jpeg', 0.85);
+          setUserModalAvatar(compressed);
+        }
+      };
+      img.src = event.target?.result as string;
+    };
+    reader.readAsDataURL(file);
   };
 
   // Toggle role in multi-role selector
@@ -232,7 +307,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
       id: editingUser ? editingUser.id : `usr-${Date.now()}`,
       name: (formData.get('name') as string).trim(),
       username: (formData.get('username') as string).trim().toLowerCase(),
-      password: (formData.get('password') as string) || '123',
+      password: userModalPassword || (formData.get('password') as string) || '123',
+      avatar: userModalAvatar,
       role: primaryRole,
       roles: selectedRoles,
       nip: (formData.get('nip') as string)?.trim() || undefined,
@@ -571,16 +647,37 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                     <tr key={u.id} className="hover:bg-slate-50 transition-colors">
                       <td className="py-3 px-3 text-center font-semibold text-slate-400">{idx + 1}</td>
                       <td className="py-3 px-4">
-                        <div>
-                          <p className="font-bold text-slate-900">{u.name}</p>
-                          <p className="text-[11px] text-slate-400 font-mono">NIP: {u.nip || '-'}</p>
+                        <div className="flex items-center gap-3">
+                          <div className="w-8 h-8 rounded-full overflow-hidden bg-[#1b357f] text-white flex items-center justify-center font-bold text-xs shrink-0 shadow-2xs">
+                            {u.avatar ? (
+                              <img src={u.avatar} alt={u.name} className="w-full h-full object-cover" />
+                            ) : (
+                              u.name.slice(0, 2).toUpperCase()
+                            )}
+                          </div>
+                          <div>
+                            <p className="font-bold text-slate-900">{u.name}</p>
+                            <p className="text-[11px] text-slate-400 font-mono">NIP: {u.nip || '-'}</p>
+                          </div>
                         </div>
                       </td>
                       <td className="py-3 px-3">
-                        <span className="font-mono bg-slate-100 px-2 py-0.5 rounded text-[11px] text-slate-800 font-bold">
-                          {u.username}
-                        </span>
-                        <p className="text-[10px] text-slate-400 mt-0.5">Pass: {u.password || '123'}</p>
+                        <div className="flex items-center gap-1.5">
+                          <span className="font-mono bg-slate-100 px-2 py-0.5 rounded text-[11px] text-slate-800 font-bold">
+                            {u.username}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-1 mt-1 text-[11px]">
+                          <span className="text-slate-500 font-mono">Pass: {u.password || '123'}</span>
+                          <button
+                            type="button"
+                            onClick={() => handleQuickResetPassword(u)}
+                            title="Reset kata sandi ke 123"
+                            className="p-0.5 text-amber-600 hover:text-amber-800 hover:bg-amber-50 rounded transition-colors"
+                          >
+                            <RefreshCw className="w-3 h-3" />
+                          </button>
+                        </div>
                       </td>
                       <td className="py-3 px-3">
                         <div className="flex flex-wrap gap-1">
@@ -955,8 +1052,49 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             </div>
 
             <form onSubmit={handleSaveUserForm} className="space-y-4">
+              {/* Foto Profil & Avatar Uploader */}
+              <div className="p-3.5 bg-slate-50 rounded-2xl border border-slate-200">
+                <label className="block text-xs font-bold text-slate-800 mb-2">Foto Profil Pengguna (Opsional)</label>
+                <div className="flex items-center gap-3.5">
+                  <div className="w-14 h-14 rounded-full overflow-hidden bg-slate-200 border-2 border-slate-300 flex items-center justify-center shrink-0">
+                    {userModalAvatar ? (
+                      <img src={userModalAvatar} alt="User Avatar" className="w-full h-full object-cover" />
+                    ) : (
+                      <span className="text-xs font-bold text-slate-600">
+                        {editingUser ? editingUser.name.slice(0, 2).toUpperCase() : 'USER'}
+                      </span>
+                    )}
+                  </div>
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-2">
+                      <label className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#1b357f] hover:bg-[#152a65] text-white rounded-xl text-xs font-bold transition-all cursor-pointer">
+                        <Camera className="w-3.5 h-3.5" />
+                        <span>Unggah Foto</span>
+                        <input
+                          type="file"
+                          accept="image/png, image/jpeg, image/jpg, image/webp"
+                          className="hidden"
+                          onChange={handleAdminAvatarUpload}
+                        />
+                      </label>
+                      {userModalAvatar && (
+                        <button
+                          type="button"
+                          onClick={() => setUserModalAvatar(undefined)}
+                          className="inline-flex items-center gap-1 px-2.5 py-1.5 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-xl text-xs font-semibold cursor-pointer"
+                        >
+                          <Trash2 className="w-3 h-3 text-rose-500" />
+                          <span>Hapus</span>
+                        </button>
+                      )}
+                    </div>
+                    <p className="text-[10px] text-slate-400">JPG/PNG/WEBP, otomatis dikompres.</p>
+                  </div>
+                </div>
+              </div>
+
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">Nama Lengkap & Gelar</label>
+                <label className="block text-xs font-bold text-slate-700 mb-1">Nama Lengkap & Gelar <span className="text-rose-500">*</span></label>
                 <input
                   type="text"
                   name="name"
@@ -969,25 +1107,45 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">Username Login</label>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">Username Login <span className="text-rose-500">*</span></label>
                   <input
                     type="text"
                     name="username"
                     defaultValue={editingUser?.username || ''}
                     required
                     placeholder="Contoh: ahmad_fauzi"
-                    className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-900 focus:bg-white focus:ring-2 focus:ring-blue-600 outline-hidden"
+                    className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-mono font-medium text-slate-900 focus:bg-white focus:ring-2 focus:ring-blue-600 outline-hidden"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">Kata Sandi (Password)</label>
-                  <input
-                    type="password"
-                    name="password"
-                    defaultValue={editingUser?.password || '123'}
-                    required
-                    className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-900 focus:bg-white focus:ring-2 focus:ring-blue-600 outline-hidden"
-                  />
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="text-xs font-bold text-slate-700">Kata Sandi (Password) <span className="text-rose-500">*</span></label>
+                    <button
+                      type="button"
+                      onClick={() => setUserModalPassword('123')}
+                      className="text-[10px] text-amber-700 hover:underline font-semibold"
+                      title="Setel ke 123"
+                    >
+                      Reset '123'
+                    </button>
+                  </div>
+                  <div className="relative">
+                    <input
+                      type={showUserModalPassword ? 'text' : 'password'}
+                      name="password"
+                      value={userModalPassword}
+                      onChange={(e) => setUserModalPassword(e.target.value)}
+                      required
+                      className="w-full pl-3 pr-8 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-mono font-medium text-slate-900 focus:bg-white focus:ring-2 focus:ring-blue-600 outline-hidden"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowUserModalPassword(!showUserModalPassword)}
+                      className="absolute right-2.5 top-2.5 text-slate-400 hover:text-slate-600 p-0.5"
+                    >
+                      {showUserModalPassword ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+                    </button>
+                  </div>
                 </div>
               </div>
 
