@@ -208,9 +208,11 @@ export const AttendanceForm: React.FC<AttendanceFormProps> = ({
     const izin = attendanceItems.filter((i) => i.status === 'I').length;
     const sakit = attendanceItems.filter((i) => i.status === 'S').length;
     const alpha = attendanceItems.filter((i) => i.status === 'A').length;
+    const bolos = attendanceItems.filter((i) => i.status === 'B').length;
+    const late = attendanceItems.filter((i) => i.status === 'T').length;
     const percent = total > 0 ? Math.round((hadir / total) * 100) : 100;
 
-    return { total, hadir, izin, sakit, alpha, percent };
+    return { total, hadir, izin, sakit, alpha, bolos, late, percent };
   }, [attendanceItems]);
 
   // Filtered student list for rendering
@@ -566,6 +568,18 @@ export const AttendanceForm: React.FC<AttendanceFormProps> = ({
               <span className="text-xs font-black">{stats.alpha}</span>
             </div>
 
+            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-purple-50 border border-purple-200 text-purple-800">
+              <span className="w-2 h-2 rounded-full bg-purple-600" />
+              <span className="text-xs font-bold">Bolos:</span>
+              <span className="text-xs font-black">{stats.bolos}</span>
+            </div>
+
+            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-orange-50 border border-orange-200 text-orange-800">
+              <span className="w-2 h-2 rounded-full bg-orange-500" />
+              <span className="text-xs font-bold">Terlambat:</span>
+              <span className="text-xs font-black">{stats.late}</span>
+            </div>
+
             <div className="px-3 py-1.5 rounded-xl bg-indigo-50 border border-indigo-200 text-indigo-900 font-bold text-xs">
               Kehadiran: {stats.percent}%
             </div>
@@ -653,6 +667,10 @@ export const AttendanceForm: React.FC<AttendanceFormProps> = ({
                         className={`hover:bg-slate-50/80 transition-colors ${
                           item.status === 'A'
                             ? 'bg-rose-50/40'
+                            : item.status === 'B'
+                            ? 'bg-purple-50/40'
+                            : item.status === 'T'
+                            ? 'bg-orange-50/40'
                             : item.status === 'S'
                             ? 'bg-amber-50/40'
                             : item.status === 'I'
@@ -701,15 +719,16 @@ export const AttendanceForm: React.FC<AttendanceFormProps> = ({
                           </span>
                         </td>
 
-                        {/* Status Radio Pills (H, I, S, A) */}
+                        {/* Status Radio Pills (H, I, S, A, B, T) */}
                         <td className="py-3 px-4">
-                          <div className="flex items-center justify-center gap-1.5">
+                          <div className="flex items-center justify-center gap-1">
                             {/* Hadir (H) */}
                             <button
                               type="button"
                               id={`status-h-${item.studentId}`}
                               onClick={() => handleUpdateStudentStatus(item.studentId, 'H')}
-                              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1 ${
+                              title="Hadir"
+                              className={`px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1 ${
                                 item.status === 'H'
                                   ? 'bg-emerald-600 text-white shadow-xs scale-102 ring-2 ring-emerald-400/40'
                                   : 'bg-slate-100 hover:bg-emerald-50 text-slate-600 hover:text-emerald-700 border border-slate-200'
@@ -724,7 +743,8 @@ export const AttendanceForm: React.FC<AttendanceFormProps> = ({
                               type="button"
                               id={`status-i-${item.studentId}`}
                               onClick={() => handleUpdateStudentStatus(item.studentId, 'I')}
-                              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1 ${
+                              title="Izin"
+                              className={`px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1 ${
                                 item.status === 'I'
                                   ? 'bg-blue-600 text-white shadow-xs scale-102 ring-2 ring-blue-400/40'
                                   : 'bg-slate-100 hover:bg-blue-50 text-slate-600 hover:text-blue-700 border border-slate-200'
@@ -739,7 +759,8 @@ export const AttendanceForm: React.FC<AttendanceFormProps> = ({
                               type="button"
                               id={`status-s-${item.studentId}`}
                               onClick={() => handleUpdateStudentStatus(item.studentId, 'S')}
-                              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1 ${
+                              title="Sakit"
+                              className={`px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1 ${
                                 item.status === 'S'
                                   ? 'bg-amber-500 text-white shadow-xs scale-102 ring-2 ring-amber-400/40'
                                   : 'bg-slate-100 hover:bg-amber-50 text-slate-600 hover:text-amber-700 border border-slate-200'
@@ -754,7 +775,8 @@ export const AttendanceForm: React.FC<AttendanceFormProps> = ({
                               type="button"
                               id={`status-a-${item.studentId}`}
                               onClick={() => handleUpdateStudentStatus(item.studentId, 'A')}
-                              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1 ${
+                              title="Alpha"
+                              className={`px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1 ${
                                 item.status === 'A'
                                   ? 'bg-rose-600 text-white shadow-xs scale-102 ring-2 ring-rose-400/40'
                                   : 'bg-slate-100 hover:bg-rose-50 text-slate-600 hover:text-rose-700 border border-slate-200'
@@ -762,6 +784,38 @@ export const AttendanceForm: React.FC<AttendanceFormProps> = ({
                             >
                               <span>A</span>
                               <span className="hidden sm:inline text-[10px] font-normal">Alpha</span>
+                            </button>
+
+                            {/* Bolos (B) */}
+                            <button
+                              type="button"
+                              id={`status-b-${item.studentId}`}
+                              onClick={() => handleUpdateStudentStatus(item.studentId, 'B')}
+                              title="Bolos"
+                              className={`px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1 ${
+                                item.status === 'B'
+                                  ? 'bg-purple-600 text-white shadow-xs scale-102 ring-2 ring-purple-400/40'
+                                  : 'bg-slate-100 hover:bg-purple-50 text-slate-600 hover:text-purple-700 border border-slate-200'
+                              }`}
+                            >
+                              <span>B</span>
+                              <span className="hidden sm:inline text-[10px] font-normal">Bolos</span>
+                            </button>
+
+                            {/* Terlambat (T) */}
+                            <button
+                              type="button"
+                              id={`status-t-${item.studentId}`}
+                              onClick={() => handleUpdateStudentStatus(item.studentId, 'T')}
+                              title="Terlambat"
+                              className={`px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1 ${
+                                item.status === 'T'
+                                  ? 'bg-orange-500 text-white shadow-xs scale-102 ring-2 ring-orange-400/40'
+                                  : 'bg-slate-100 hover:bg-orange-50 text-slate-600 hover:text-orange-700 border border-slate-200'
+                              }`}
+                            >
+                              <span>T</span>
+                              <span className="hidden sm:inline text-[10px] font-normal">Telat</span>
                             </button>
                           </div>
                         </td>
@@ -777,6 +831,10 @@ export const AttendanceForm: React.FC<AttendanceFormProps> = ({
                                 ? 'Keterangan sakit / surat dokter...'
                                 : item.status === 'I'
                                 ? 'Alasan izin / keperluan...'
+                                : item.status === 'B'
+                                ? 'Kronologi / keterangan bolos...'
+                                : item.status === 'T'
+                                ? 'Alasan terlambat (menit/sebab)...'
                                 : 'Penyebab alpha / tanpa keterangan...'
                             }
                             value={item.notes || ''}

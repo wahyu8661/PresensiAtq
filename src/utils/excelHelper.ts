@@ -126,17 +126,20 @@ export const exportAttendanceReportToExcel = (
     : students;
 
   // Aggregate stats per student from the records
-  const studentStats = new Map<string, { present: number; sick: number; permit: number; alpha: number; total: number; notes: string[] }>();
+  const studentStats = new Map<
+    string,
+    { present: number; sick: number; permit: number; alpha: number; bolos: number; late: number; total: number; notes: string[] }
+  >();
 
   targetStudents.forEach((s) => {
-    studentStats.set(s.id, { present: 0, sick: 0, permit: 0, alpha: 0, total: 0, notes: [] });
+    studentStats.set(s.id, { present: 0, sick: 0, permit: 0, alpha: 0, bolos: 0, late: 0, total: 0, notes: [] });
   });
 
   records.forEach((rec) => {
     rec.items.forEach((item) => {
       let stat = studentStats.get(item.studentId);
       if (!stat) {
-        stat = { present: 0, sick: 0, permit: 0, alpha: 0, total: 0, notes: [] };
+        stat = { present: 0, sick: 0, permit: 0, alpha: 0, bolos: 0, late: 0, total: 0, notes: [] };
         studentStats.set(item.studentId, stat);
       }
       stat.total += 1;
@@ -144,6 +147,8 @@ export const exportAttendanceReportToExcel = (
       else if (item.status === 'S') stat.sick += 1;
       else if (item.status === 'I') stat.permit += 1;
       else if (item.status === 'A') stat.alpha += 1;
+      else if (item.status === 'B') stat.bolos += 1;
+      else if (item.status === 'T') stat.late += 1;
 
       if (item.notes && item.notes.trim()) {
         stat.notes.push(`[${rec.date} Jam ${rec.periodStart}-${rec.periodEnd} ${rec.subjectName}]: ${item.notes}`);
@@ -153,7 +158,7 @@ export const exportAttendanceReportToExcel = (
 
   // Sheet 1: Rekap Per Siswa
   const studentRows = targetStudents.map((s, index) => {
-    const stat = studentStats.get(s.id) || { present: 0, sick: 0, permit: 0, alpha: 0, total: 0, notes: [] };
+    const stat = studentStats.get(s.id) || { present: 0, sick: 0, permit: 0, alpha: 0, bolos: 0, late: 0, total: 0, notes: [] };
     const rate = stat.total > 0 ? Math.round((stat.present / stat.total) * 100) : 100;
 
     return {
@@ -168,6 +173,8 @@ export const exportAttendanceReportToExcel = (
       'Izin (I)': stat.permit,
       'Sakit (S)': stat.sick,
       'Alpha (A)': stat.alpha,
+      'Bolos (B)': stat.bolos,
+      'Terlambat (T)': stat.late,
       'Persentase Kehadiran': `${rate}%`,
       'Catatan Khusus': stat.notes.slice(-3).join(' | ') || '-',
     };
@@ -179,9 +186,23 @@ export const exportAttendanceReportToExcel = (
     const iCount = r.items.filter((i) => i.status === 'I').length;
     const sCount = r.items.filter((i) => i.status === 'S').length;
     const aCount = r.items.filter((i) => i.status === 'A').length;
+    const bCount = r.items.filter((i) => i.status === 'B').length;
+    const tCount = r.items.filter((i) => i.status === 'T').length;
     const absentees = r.items
       .filter((i) => i.status !== 'H')
-      .map((i) => `${i.studentName} (${i.status}${i.notes ? ': ' + i.notes : ''})`)
+      .map((i) => {
+        const label =
+          i.status === 'I'
+            ? 'Izin'
+            : i.status === 'S'
+            ? 'Sakit'
+            : i.status === 'A'
+            ? 'Alpha'
+            : i.status === 'B'
+            ? 'Bolos'
+            : 'Terlambat';
+        return `${i.studentName} (${label}${i.notes ? ': ' + i.notes : ''})`;
+      })
       .join('; ');
 
     return {
@@ -197,7 +218,9 @@ export const exportAttendanceReportToExcel = (
       'Izin': iCount,
       'Sakit': sCount,
       'Alpha': aCount,
-      'Daftar Siswa Tidak Hadir & Keterangan': absentees || 'Nihil (Hadir Semua)',
+      'Bolos': bCount,
+      'Terlambat': tCount,
+      'Daftar Siswa Tidak Hadir / Catatan': absentees || 'Nihil (Hadir Semua)',
       'Catatan Guru': r.notes || '-',
     };
   });
@@ -217,6 +240,8 @@ export const exportAttendanceReportToExcel = (
     { wch: 10 },
     { wch: 10 },
     { wch: 10 },
+    { wch: 10 },
+    { wch: 12 },
     { wch: 20 },
     { wch: 45 },
   ];
@@ -236,6 +261,8 @@ export const exportAttendanceReportToExcel = (
     { wch: 8 },
     { wch: 8 },
     { wch: 8 },
+    { wch: 8 },
+    { wch: 10 },
     { wch: 45 },
     { wch: 30 },
   ];

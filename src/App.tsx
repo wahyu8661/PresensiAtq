@@ -134,6 +134,11 @@ export default function App() {
     });
   };
 
+  // Handler to Delete Attendance Record
+  const handleDeleteAttendanceRecord = (recordId: string) => {
+    setRecords((prev) => prev.filter((r) => r.id !== recordId));
+  };
+
   // Handler to Save / Update User (Flowchart: Input user baru)
   const handleSaveUser = (user: User) => {
     setUsers((prev) => {
@@ -257,6 +262,8 @@ export default function App() {
             onNavigateToForm={(classId) => {
               setActiveTab('input_presensi');
             }}
+            onSaveRecord={handleSaveAttendanceRecord}
+            onDeleteRecord={handleDeleteAttendanceRecord}
             onViewStudentDetail={(student) => setSelectedStudentForDetail(student)}
           />
         )}

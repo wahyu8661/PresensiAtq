@@ -1,6 +1,6 @@
 export type UserRole = 'admin' | 'wali_kelas' | 'guru_mapel';
 
-export type AttendanceStatus = 'H' | 'I' | 'S' | 'A'; // Hadir, Izin, Sakit, Alpha
+export type AttendanceStatus = 'H' | 'I' | 'S' | 'A' | 'B' | 'T'; // Hadir, Izin, Sakit, Alpha, Bolos, Terlambat
 
 export interface User {
   id: string;
@@ -101,6 +101,8 @@ export interface DailyClassSummary {
   permit: number;
   sick: number;
   alpha: number;
+  bolos?: number;
+  late?: number;
   attendanceRate: number;
   periodsFilled: number[]; // e.g. [1, 2, 3, 4]
 }

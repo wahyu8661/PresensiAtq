@@ -129,6 +129,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
     let izin = 0;
     let sakit = 0;
     let alpha = 0;
+    let bolos = 0;
+    let late = 0;
     let totalItems = 0;
 
     todayRecords.forEach((rec) => {
@@ -138,11 +140,13 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
         else if (item.status === 'I') izin += 1;
         else if (item.status === 'S') sakit += 1;
         else if (item.status === 'A') alpha += 1;
+        else if (item.status === 'B') bolos += 1;
+        else if (item.status === 'T') late += 1;
       });
     });
 
     const percent = totalItems > 0 ? Math.round((hadir / totalItems) * 100) : 100;
-    return { hadir, izin, sakit, alpha, totalItems, percent, sessionCount: todayRecords.length };
+    return { hadir, izin, sakit, alpha, bolos, late, totalItems, percent, sessionCount: todayRecords.length };
   }, [todayRecords]);
 
   // Filtered Users
@@ -475,7 +479,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
               <span className="text-[11px] font-bold uppercase">Tingkat Kehadiran Hari Ini</span>
               <p className="text-2xl font-black mt-1">{todayStats.percent}%</p>
               <p className="text-[11px] text-emerald-700 mt-0.5">
-                {todayStats.hadir} Hadir • {todayStats.sakit} Sakit • {todayStats.izin} Izin • {todayStats.alpha} Alpha
+                {todayStats.hadir} Hadir • {todayStats.sakit} S • {todayStats.izin} I • {todayStats.alpha} A • {todayStats.bolos} B • {todayStats.late} T
               </p>
             </div>
           </div>

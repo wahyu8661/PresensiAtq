@@ -14,7 +14,7 @@ const STORAGE_KEYS = {
   CLASSES: 'attaufiq_presensi_classes_v5_resmi_spreadsheet',
   SUBJECTS: 'attaufiq_presensi_subjects_v5_resmi_spreadsheet',
   PERIODS: 'attaufiq_presensi_periods_v5_resmi_spreadsheet',
-  RECORDS: 'attaufiq_presensi_records_v5_resmi_spreadsheet',
+  RECORDS: 'attaufiq_presensi_records_v6_clean',
   CURRENT_USER: 'attaufiq_presensi_curr_user_v5_resmi_spreadsheet',
 };
 

@@ -42,7 +42,7 @@ export const StudentDetailModal: React.FC<StudentDetailModalProps> = ({
       periodStart: number;
       periodEnd: number;
       teacherName: string;
-      status: 'H' | 'I' | 'S' | 'A';
+      status: 'H' | 'I' | 'S' | 'A' | 'B' | 'T';
       notes?: string;
       topic?: string;
     }> = [];
@@ -72,6 +72,8 @@ export const StudentDetailModal: React.FC<StudentDetailModalProps> = ({
   const izin = studentLogs.filter((l) => l.status === 'I').length;
   const sakit = studentLogs.filter((l) => l.status === 'S').length;
   const alpha = studentLogs.filter((l) => l.status === 'A').length;
+  const bolos = studentLogs.filter((l) => l.status === 'B').length;
+  const telat = studentLogs.filter((l) => l.status === 'T').length;
   const percentage = total > 0 ? Math.round((hadir / total) * 100) : 100;
 
   return (
@@ -108,33 +110,41 @@ export const StudentDetailModal: React.FC<StudentDetailModalProps> = ({
           <button
             type="button"
             onClick={onClose}
-            className="text-slate-400 hover:text-slate-600 p-1"
+            className="text-slate-400 hover:text-slate-600 p-1 cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* Attendance Summary Cards */}
-        <div className="grid grid-cols-5 gap-2 my-4">
-          <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200 text-center">
-            <span className="text-[10px] font-bold text-slate-500 uppercase">Total Sesi</span>
-            <p className="text-base font-black text-slate-800 mt-0.5">{total}</p>
+        <div className="grid grid-cols-3 sm:grid-cols-7 gap-2 my-4">
+          <div className="p-2 rounded-xl bg-slate-50 border border-slate-200 text-center">
+            <span className="text-[9px] font-bold text-slate-500 uppercase">Sesi</span>
+            <p className="text-sm font-black text-slate-800 mt-0.5">{total}</p>
           </div>
-          <div className="p-2.5 rounded-xl bg-emerald-50 border border-emerald-200 text-center">
-            <span className="text-[10px] font-bold text-emerald-700 uppercase">Hadir</span>
-            <p className="text-base font-black text-emerald-800 mt-0.5">{hadir}</p>
+          <div className="p-2 rounded-xl bg-emerald-50 border border-emerald-200 text-center">
+            <span className="text-[9px] font-bold text-emerald-700 uppercase">Hadir</span>
+            <p className="text-sm font-black text-emerald-800 mt-0.5">{hadir}</p>
           </div>
-          <div className="p-2.5 rounded-xl bg-blue-50 border border-blue-200 text-center">
-            <span className="text-[10px] font-bold text-blue-700 uppercase">Izin</span>
-            <p className="text-base font-black text-blue-800 mt-0.5">{izin}</p>
+          <div className="p-2 rounded-xl bg-blue-50 border border-blue-200 text-center">
+            <span className="text-[9px] font-bold text-blue-700 uppercase">Izin</span>
+            <p className="text-sm font-black text-blue-800 mt-0.5">{izin}</p>
           </div>
-          <div className="p-2.5 rounded-xl bg-amber-50 border border-amber-200 text-center">
-            <span className="text-[10px] font-bold text-amber-700 uppercase">Sakit</span>
-            <p className="text-base font-black text-amber-800 mt-0.5">{sakit}</p>
+          <div className="p-2 rounded-xl bg-amber-50 border border-amber-200 text-center">
+            <span className="text-[9px] font-bold text-amber-700 uppercase">Sakit</span>
+            <p className="text-sm font-black text-amber-800 mt-0.5">{sakit}</p>
           </div>
-          <div className="p-2.5 rounded-xl bg-rose-50 border border-rose-200 text-center">
-            <span className="text-[10px] font-bold text-rose-700 uppercase">Alpha</span>
-            <p className="text-base font-black text-rose-800 mt-0.5">{alpha}</p>
+          <div className="p-2 rounded-xl bg-rose-50 border border-rose-200 text-center">
+            <span className="text-[9px] font-bold text-rose-700 uppercase">Alpha</span>
+            <p className="text-sm font-black text-rose-800 mt-0.5">{alpha}</p>
+          </div>
+          <div className="p-2 rounded-xl bg-purple-50 border border-purple-200 text-center">
+            <span className="text-[9px] font-bold text-purple-700 uppercase">Bolos</span>
+            <p className="text-sm font-black text-purple-800 mt-0.5">{bolos}</p>
+          </div>
+          <div className="p-2 rounded-xl bg-orange-50 border border-orange-200 text-center">
+            <span className="text-[9px] font-bold text-orange-700 uppercase">Telat</span>
+            <p className="text-sm font-black text-orange-800 mt-0.5">{telat}</p>
           </div>
         </div>
 
@@ -175,6 +185,10 @@ export const StudentDetailModal: React.FC<StudentDetailModalProps> = ({
                   ? 'bg-blue-100 text-blue-800 border-blue-300'
                   : log.status === 'S'
                   ? 'bg-amber-100 text-amber-800 border-amber-300'
+                  : log.status === 'B'
+                  ? 'bg-purple-100 text-purple-800 border-purple-300'
+                  : log.status === 'T'
+                  ? 'bg-orange-100 text-orange-800 border-orange-300'
                   : 'bg-rose-100 text-rose-800 border-rose-300';
 
               const statusText =
@@ -184,6 +198,10 @@ export const StudentDetailModal: React.FC<StudentDetailModalProps> = ({
                   ? 'Izin'
                   : log.status === 'S'
                   ? 'Sakit'
+                  : log.status === 'B'
+                  ? 'Bolos'
+                  : log.status === 'T'
+                  ? 'Terlambat'
                   : 'Alpha';
 
               return (

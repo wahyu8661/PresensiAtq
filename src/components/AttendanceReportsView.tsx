@@ -25,7 +25,8 @@ import {
   MailQuestion,
   UserX,
   FileText,
-  Clock
+  Clock,
+  AlertTriangle
 } from 'lucide-react';
 
 interface AttendanceReportsViewProps {
@@ -115,17 +116,20 @@ export const AttendanceReportsView: React.FC<AttendanceReportsViewProps> = ({
 
   // Aggregate stats per student based on filtered records
   const studentStatsMap = useMemo(() => {
-    const map = new Map<string, { present: number; permit: number; sick: number; alpha: number; total: number; notes: string[] }>();
+    const map = new Map<
+      string,
+      { present: number; permit: number; sick: number; alpha: number; bolos: number; late: number; total: number; notes: string[] }
+    >();
 
     targetStudents.forEach((s) => {
-      map.set(s.id, { present: 0, permit: 0, sick: 0, alpha: 0, total: 0, notes: [] });
+      map.set(s.id, { present: 0, permit: 0, sick: 0, alpha: 0, bolos: 0, late: 0, total: 0, notes: [] });
     });
 
     filteredRecords.forEach((rec) => {
       rec.items.forEach((item) => {
         let stat = map.get(item.studentId);
         if (!stat && (selectedClass === 'ALL' || item.studentId)) {
-          stat = { present: 0, permit: 0, sick: 0, alpha: 0, total: 0, notes: [] };
+          stat = { present: 0, permit: 0, sick: 0, alpha: 0, bolos: 0, late: 0, total: 0, notes: [] };
           map.set(item.studentId, stat);
         }
         if (stat) {
@@ -134,6 +138,8 @@ export const AttendanceReportsView: React.FC<AttendanceReportsViewProps> = ({
           else if (item.status === 'I') stat.permit += 1;
           else if (item.status === 'S') stat.sick += 1;
           else if (item.status === 'A') stat.alpha += 1;
+          else if (item.status === 'B') stat.bolos += 1;
+          else if (item.status === 'T') stat.late += 1;
 
           if (item.notes) {
             stat.notes.push(`${rec.date} (${rec.subjectName}): ${item.notes}`);
@@ -151,6 +157,8 @@ export const AttendanceReportsView: React.FC<AttendanceReportsViewProps> = ({
     let totalPermit = 0;
     let totalSick = 0;
     let totalAlpha = 0;
+    let totalBolos = 0;
+    let totalLate = 0;
     let totalSessions = 0;
 
     studentStatsMap.forEach((stat) => {
@@ -158,11 +166,13 @@ export const AttendanceReportsView: React.FC<AttendanceReportsViewProps> = ({
       totalPermit += stat.permit;
       totalSick += stat.sick;
       totalAlpha += stat.alpha;
+      totalBolos += stat.bolos;
+      totalLate += stat.late;
       totalSessions += stat.total;
     });
 
     const percent = totalSessions > 0 ? Math.round((totalPresent / totalSessions) * 100) : 100;
-    return { totalPresent, totalPermit, totalSick, totalAlpha, totalSessions, percent };
+    return { totalPresent, totalPermit, totalSick, totalAlpha, totalBolos, totalLate, totalSessions, percent };
   }, [studentStatsMap]);
 
   const handleExportExcel = () => {
@@ -304,47 +314,63 @@ export const AttendanceReportsView: React.FC<AttendanceReportsViewProps> = ({
       </div>
 
       {/* Aggregate Overview Metrics Bar */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+      <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3">
         <div className="bg-white p-3.5 rounded-2xl border border-slate-200 shadow-xs">
-          <span className="text-[11px] font-bold text-slate-500 uppercase">Total Sesi Terlaksana</span>
-          <p className="text-xl font-black text-slate-800 mt-1">{filteredRecords.length} Sesi</p>
+          <span className="text-[10px] font-bold text-slate-500 uppercase">Total Sesi</span>
+          <p className="text-lg font-black text-slate-800 mt-1">{filteredRecords.length} Sesi</p>
         </div>
 
         <div className="bg-emerald-50 p-3.5 rounded-2xl border border-emerald-200 shadow-xs text-emerald-900">
-          <span className="text-[11px] font-bold uppercase flex items-center gap-1">
+          <span className="text-[10px] font-bold uppercase flex items-center gap-1">
             <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
             Hadir (H)
           </span>
-          <p className="text-xl font-black mt-1">{overallTotals.totalPresent}</p>
+          <p className="text-lg font-black mt-1">{overallTotals.totalPresent}</p>
         </div>
 
         <div className="bg-blue-50 p-3.5 rounded-2xl border border-blue-200 shadow-xs text-blue-900">
-          <span className="text-[11px] font-bold uppercase flex items-center gap-1">
+          <span className="text-[10px] font-bold uppercase flex items-center gap-1">
             <MailQuestion className="w-3.5 h-3.5 text-blue-600" />
             Izin (I)
           </span>
-          <p className="text-xl font-black mt-1">{overallTotals.totalPermit}</p>
+          <p className="text-lg font-black mt-1">{overallTotals.totalPermit}</p>
         </div>
 
         <div className="bg-amber-50 p-3.5 rounded-2xl border border-amber-200 shadow-xs text-amber-900">
-          <span className="text-[11px] font-bold uppercase flex items-center gap-1">
+          <span className="text-[10px] font-bold uppercase flex items-center gap-1">
             <HeartPulse className="w-3.5 h-3.5 text-amber-600" />
             Sakit (S)
           </span>
-          <p className="text-xl font-black mt-1">{overallTotals.totalSick}</p>
+          <p className="text-lg font-black mt-1">{overallTotals.totalSick}</p>
         </div>
 
         <div className="bg-rose-50 p-3.5 rounded-2xl border border-rose-200 shadow-xs text-rose-900">
-          <span className="text-[11px] font-bold uppercase flex items-center gap-1">
+          <span className="text-[10px] font-bold uppercase flex items-center gap-1">
             <UserX className="w-3.5 h-3.5 text-rose-600" />
             Alpha (A)
           </span>
-          <p className="text-xl font-black mt-1">{overallTotals.totalAlpha}</p>
+          <p className="text-lg font-black mt-1">{overallTotals.totalAlpha}</p>
+        </div>
+
+        <div className="bg-purple-50 p-3.5 rounded-2xl border border-purple-200 shadow-xs text-purple-900">
+          <span className="text-[10px] font-bold uppercase flex items-center gap-1">
+            <AlertTriangle className="w-3.5 h-3.5 text-purple-600" />
+            Bolos (B)
+          </span>
+          <p className="text-lg font-black mt-1">{overallTotals.totalBolos}</p>
+        </div>
+
+        <div className="bg-orange-50 p-3.5 rounded-2xl border border-orange-200 shadow-xs text-orange-900">
+          <span className="text-[10px] font-bold uppercase flex items-center gap-1">
+            <Clock className="w-3.5 h-3.5 text-orange-600" />
+            Telat (T)
+          </span>
+          <p className="text-lg font-black mt-1">{overallTotals.totalLate}</p>
         </div>
 
         <div className="bg-[#1b357f] p-3.5 rounded-2xl text-white shadow-xs">
-          <span className="text-[11px] font-bold text-amber-300 uppercase">Rerata Kehadiran</span>
-          <p className="text-xl font-black mt-1">{overallTotals.percent}%</p>
+          <span className="text-[10px] font-bold text-amber-300 uppercase">% Rerata</span>
+          <p className="text-lg font-black mt-1">{overallTotals.percent}%</p>
         </div>
       </div>
 
@@ -404,25 +430,27 @@ export const AttendanceReportsView: React.FC<AttendanceReportsViewProps> = ({
                   <th className="py-3 px-4 min-w-[200px]">Nama Siswa & NISN</th>
                   <th className="py-3 px-2 text-center w-12">L/P</th>
                   <th className="py-3 px-3 min-w-[130px]">Kelas</th>
-                  <th className="py-3 px-3 text-center min-w-[60px]">Sesi</th>
-                  <th className="py-3 px-3 text-center min-w-[60px] text-emerald-800 bg-emerald-50/50">H</th>
-                  <th className="py-3 px-3 text-center min-w-[60px] text-blue-800 bg-blue-50/50">I</th>
-                  <th className="py-3 px-3 text-center min-w-[60px] text-amber-800 bg-amber-50/50">S</th>
-                  <th className="py-3 px-3 text-center min-w-[60px] text-rose-800 bg-rose-50/50">A</th>
-                  <th className="py-3 px-3 text-center min-w-[80px]">% Hadir</th>
-                  <th className="py-3 px-4 text-center min-w-[100px]">Aksi</th>
+                  <th className="py-3 px-3 text-center min-w-[50px]">Sesi</th>
+                  <th className="py-3 px-3 text-center min-w-[45px] text-emerald-800 bg-emerald-50/50">H</th>
+                  <th className="py-3 px-3 text-center min-w-[45px] text-blue-800 bg-blue-50/50">I</th>
+                  <th className="py-3 px-3 text-center min-w-[45px] text-amber-800 bg-amber-50/50">S</th>
+                  <th className="py-3 px-3 text-center min-w-[45px] text-rose-800 bg-rose-50/50">A</th>
+                  <th className="py-3 px-3 text-center min-w-[45px] text-purple-800 bg-purple-50/50">B</th>
+                  <th className="py-3 px-3 text-center min-w-[45px] text-orange-800 bg-orange-50/50">T</th>
+                  <th className="py-3 px-3 text-center min-w-[70px]">% Hadir</th>
+                  <th className="py-3 px-4 text-center min-w-[90px]">Aksi</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
                 {targetStudents.length === 0 ? (
                   <tr>
-                    <td colSpan={11} className="py-12 text-center text-slate-400 font-semibold">
+                    <td colSpan={13} className="py-12 text-center text-slate-400 font-semibold">
                       Tidak ada siswa yang sesuai kriteria filter.
                     </td>
                   </tr>
                 ) : (
                   targetStudents.map((s, idx) => {
-                    const stat = studentStatsMap.get(s.id) || { present: 0, permit: 0, sick: 0, alpha: 0, total: 0, notes: [] };
+                    const stat = studentStatsMap.get(s.id) || { present: 0, permit: 0, sick: 0, alpha: 0, bolos: 0, late: 0, total: 0, notes: [] };
                     const rate = stat.total > 0 ? Math.round((stat.present / stat.total) * 100) : 100;
 
                     return (
@@ -447,6 +475,8 @@ export const AttendanceReportsView: React.FC<AttendanceReportsViewProps> = ({
                         <td className="py-3 px-3 text-center font-bold text-blue-700 bg-blue-50/30">{stat.permit}</td>
                         <td className="py-3 px-3 text-center font-bold text-amber-700 bg-amber-50/30">{stat.sick}</td>
                         <td className="py-3 px-3 text-center font-bold text-rose-700 bg-rose-50/30">{stat.alpha}</td>
+                        <td className="py-3 px-3 text-center font-bold text-purple-700 bg-purple-50/30">{stat.bolos}</td>
+                        <td className="py-3 px-3 text-center font-bold text-orange-700 bg-orange-50/30">{stat.late}</td>
                         <td className="py-3 px-3 text-center font-extrabold text-slate-900">
                           <span className={`px-2 py-0.5 rounded-full ${rate >= 90 ? 'bg-emerald-100 text-emerald-800' : rate >= 75 ? 'bg-amber-100 text-amber-800' : 'bg-rose-100 text-rose-800'}`}>
                             {rate}%
@@ -456,7 +486,7 @@ export const AttendanceReportsView: React.FC<AttendanceReportsViewProps> = ({
                           <button
                             type="button"
                             onClick={() => onViewStudentDetail(s)}
-                            className="inline-flex items-center gap-1 px-2.5 py-1 bg-slate-100 hover:bg-blue-50 text-blue-700 rounded-lg text-xs font-semibold transition-all"
+                            className="inline-flex items-center gap-1 px-2.5 py-1 bg-slate-100 hover:bg-blue-50 text-blue-700 rounded-lg text-xs font-semibold transition-all cursor-pointer"
                           >
                             <Eye className="w-3.5 h-3.5" />
                             <span>Detail</span>
@@ -481,17 +511,19 @@ export const AttendanceReportsView: React.FC<AttendanceReportsViewProps> = ({
                   <th className="py-3 px-3 min-w-[100px]">Jam Ke</th>
                   <th className="py-3 px-4 min-w-[180px]">Mata Pelajaran & Guru</th>
                   <th className="py-3 px-4 min-w-[180px]">Materi / Topik</th>
-                  <th className="py-3 px-3 text-center min-w-[50px]">H</th>
-                  <th className="py-3 px-3 text-center min-w-[50px]">I</th>
-                  <th className="py-3 px-3 text-center min-w-[50px]">S</th>
-                  <th className="py-3 px-3 text-center min-w-[50px]">A</th>
+                  <th className="py-3 px-3 text-center min-w-[40px]">H</th>
+                  <th className="py-3 px-3 text-center min-w-[40px]">I</th>
+                  <th className="py-3 px-3 text-center min-w-[40px]">S</th>
+                  <th className="py-3 px-3 text-center min-w-[40px]">A</th>
+                  <th className="py-3 px-3 text-center min-w-[40px]">B</th>
+                  <th className="py-3 px-3 text-center min-w-[40px]">T</th>
                   <th className="py-3 px-4 min-w-[200px]">Ketidakhadiran & Keterangan</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
                 {filteredRecords.length === 0 ? (
                   <tr>
-                    <td colSpan={11} className="py-12 text-center text-slate-400 font-semibold">
+                    <td colSpan={13} className="py-12 text-center text-slate-400 font-semibold">
                       Belum ada jurnal presensi pada rentang tanggal ini.
                     </td>
                   </tr>
@@ -501,9 +533,23 @@ export const AttendanceReportsView: React.FC<AttendanceReportsViewProps> = ({
                     const iCount = rec.items.filter((i) => i.status === 'I').length;
                     const sCount = rec.items.filter((i) => i.status === 'S').length;
                     const aCount = rec.items.filter((i) => i.status === 'A').length;
+                    const bCount = rec.items.filter((i) => i.status === 'B').length;
+                    const tCount = rec.items.filter((i) => i.status === 'T').length;
                     const absentItems = rec.items
                       .filter((i) => i.status !== 'H')
-                      .map((i) => `${i.studentName} (${i.status}${i.notes ? ': ' + i.notes : ''})`)
+                      .map((i) => {
+                        const statusLabel =
+                          i.status === 'I'
+                            ? 'Izin'
+                            : i.status === 'S'
+                            ? 'Sakit'
+                            : i.status === 'A'
+                            ? 'Alpha'
+                            : i.status === 'B'
+                            ? 'Bolos'
+                            : 'Terlambat';
+                        return `${i.studentName} (${statusLabel}${i.notes ? ': ' + i.notes : ''})`;
+                      })
                       .join('; ');
 
                     return (
@@ -527,6 +573,8 @@ export const AttendanceReportsView: React.FC<AttendanceReportsViewProps> = ({
                         <td className="py-3 px-3 text-center font-bold text-blue-600">{iCount}</td>
                         <td className="py-3 px-3 text-center font-bold text-amber-600">{sCount}</td>
                         <td className="py-3 px-3 text-center font-bold text-rose-600">{aCount}</td>
+                        <td className="py-3 px-3 text-center font-bold text-purple-600">{bCount}</td>
+                        <td className="py-3 px-3 text-center font-bold text-orange-600">{tCount}</td>
                         <td className="py-3 px-4">
                           {absentItems ? (
                             <span className="text-rose-700 font-medium">{absentItems}</span>
