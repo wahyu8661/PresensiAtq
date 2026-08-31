@@ -9,13 +9,13 @@ import {
 } from '../data/initialData';
 
 const STORAGE_KEYS = {
-  USERS: 'attaufiq_presensi_users_v3_jadwal_2026',
-  STUDENTS: 'attaufiq_presensi_students_v3_jadwal_2026',
-  CLASSES: 'attaufiq_presensi_classes_v3_jadwal_2026',
-  SUBJECTS: 'attaufiq_presensi_subjects_v3_jadwal_2026',
-  PERIODS: 'attaufiq_presensi_periods_v3_jadwal_2026',
-  RECORDS: 'attaufiq_presensi_records_v3_jadwal_2026',
-  CURRENT_USER: 'attaufiq_presensi_curr_user_v3_jadwal_2026',
+  USERS: 'attaufiq_presensi_users_v4_2026',
+  STUDENTS: 'attaufiq_presensi_students_v4_2026',
+  CLASSES: 'attaufiq_presensi_classes_v4_2026',
+  SUBJECTS: 'attaufiq_presensi_subjects_v4_2026',
+  PERIODS: 'attaufiq_presensi_periods_v4_2026',
+  RECORDS: 'attaufiq_presensi_records_v4_2026',
+  CURRENT_USER: 'attaufiq_presensi_curr_user_v4_2026',
 };
 
 export const getStoredUsers = (): User[] => {
@@ -121,19 +121,25 @@ export const saveStoredAttendanceRecords = (records: AttendanceRecord[]) => {
   localStorage.setItem(STORAGE_KEYS.RECORDS, JSON.stringify(records));
 };
 
-export const getStoredCurrentUser = (): User => {
+export const getStoredCurrentUser = (): User | null => {
   try {
-    const data = localStorage.getItem(STORAGE_KEYS.CURRENT_USER);
+    const data = sessionStorage.getItem(STORAGE_KEYS.CURRENT_USER) || localStorage.getItem(STORAGE_KEYS.CURRENT_USER);
     if (data) return JSON.parse(data);
   } catch {
     // fallback
   }
-  // Default to Admin or Guru
-  return INITIAL_USERS[0];
+  // Initial visitor should always start at login page
+  return null;
 };
 
-export const saveStoredCurrentUser = (user: User) => {
-  localStorage.setItem(STORAGE_KEYS.CURRENT_USER, JSON.stringify(user));
+export const saveStoredCurrentUser = (user: User | null) => {
+  if (user) {
+    sessionStorage.setItem(STORAGE_KEYS.CURRENT_USER, JSON.stringify(user));
+    localStorage.setItem(STORAGE_KEYS.CURRENT_USER, JSON.stringify(user));
+  } else {
+    sessionStorage.removeItem(STORAGE_KEYS.CURRENT_USER);
+    localStorage.removeItem(STORAGE_KEYS.CURRENT_USER);
+  }
 };
 
 export const resetAllDataToDefault = () => {
@@ -143,5 +149,6 @@ export const resetAllDataToDefault = () => {
   localStorage.setItem(STORAGE_KEYS.SUBJECTS, JSON.stringify(INITIAL_SUBJECTS));
   localStorage.setItem(STORAGE_KEYS.PERIODS, JSON.stringify(INITIAL_PERIODS));
   localStorage.setItem(STORAGE_KEYS.RECORDS, JSON.stringify(generateInitialAttendanceRecords()));
-  localStorage.setItem(STORAGE_KEYS.CURRENT_USER, JSON.stringify(INITIAL_USERS[0]));
+  sessionStorage.removeItem(STORAGE_KEYS.CURRENT_USER);
+  localStorage.removeItem(STORAGE_KEYS.CURRENT_USER);
 };

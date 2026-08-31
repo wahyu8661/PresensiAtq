@@ -75,9 +75,7 @@ export default function App() {
   }, [records]);
 
   useEffect(() => {
-    if (currentUser) {
-      saveStoredCurrentUser(currentUser);
-    }
+    saveStoredCurrentUser(currentUser);
   }, [currentUser]);
 
   // Set default initial tab based on role according to the Flowchart:
@@ -96,11 +94,13 @@ export default function App() {
 
   const handleLoginSuccess = (user: User) => {
     setCurrentUser(user);
+    saveStoredCurrentUser(user);
     navigateByRole(user);
   };
 
   const handleLogout = () => {
     setCurrentUser(null);
+    saveStoredCurrentUser(null);
   };
 
   // Handler to switch active role within the user's assigned roles
