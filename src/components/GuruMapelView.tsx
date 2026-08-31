@@ -118,7 +118,7 @@ export const GuruMapelView: React.FC<GuruMapelViewProps> = ({
                       Kelas {cls.id}
                     </span>
                     <span className="text-[11px] font-semibold text-slate-400">
-                      {classStudentCount} Santri
+                      {classStudentCount} Siswa
                     </span>
                   </div>
                   <h4 className="text-sm font-bold text-slate-900 mt-2 group-hover:text-emerald-700 transition-colors">

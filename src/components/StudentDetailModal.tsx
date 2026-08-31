@@ -164,7 +164,7 @@ export const StudentDetailModal: React.FC<StudentDetailModalProps> = ({
 
           {studentLogs.length === 0 ? (
             <p className="text-xs text-slate-400 italic py-6 text-center">
-              Belum ada data rekaman presensi untuk santri ini.
+              Belum ada data rekaman presensi untuk siswa ini.
             </p>
           ) : (
             studentLogs.map((log, i) => {

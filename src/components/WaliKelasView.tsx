@@ -132,7 +132,7 @@ export const WaliKelasView: React.FC<WaliKelasViewProps> = ({
             Pantauan Presensi Kelas {targetClass?.name || targetClassId}
           </h2>
           <p className="text-xs text-blue-100 mt-1">
-            Wali Kelas: <strong className="text-white">{currentUser.name}</strong> • Total {classStudents.length} Santri Binaan
+            Wali Kelas: <strong className="text-white">{currentUser.name}</strong> • Total {classStudents.length} Siswa Binaan
           </p>
         </div>
 
@@ -242,10 +242,10 @@ export const WaliKelasView: React.FC<WaliKelasViewProps> = ({
             </div>
             <div className="flex-1">
               <h4 className="text-xs font-bold text-amber-900 uppercase tracking-wide">
-                Perhatian Wali Kelas: Santri dengan Catatan Absensi
+                Perhatian Wali Kelas: Siswa dengan Catatan Absensi
               </h4>
               <p className="text-xs text-amber-800 mt-0.5">
-                Terdapat {attentionStudents.length} santri yang memiliki catatan Alpha atau Sakit/Izin berulang:
+                Terdapat {attentionStudents.length} siswa yang memiliki catatan Alpha atau Sakit/Izin berulang:
               </p>
               <div className="flex flex-wrap gap-2 mt-2">
                 {attentionStudents.map((s) => {
@@ -274,7 +274,7 @@ export const WaliKelasView: React.FC<WaliKelasViewProps> = ({
         <div className="p-4 bg-slate-50/80 border-b border-slate-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
           <div>
             <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider">
-              Rekapitulasi Kehadiran Santri Kelas {targetClass?.name}
+              Rekapitulasi Kehadiran Siswa Kelas {targetClass?.name}
             </h4>
             <p className="text-[11px] text-slate-500">
               Status per tanggal {selectedDate} dan akumulasi semester
@@ -298,7 +298,7 @@ export const WaliKelasView: React.FC<WaliKelasViewProps> = ({
             <thead className="bg-slate-100 text-slate-800 font-bold border-b border-slate-200">
               <tr>
                 <th className="py-3 px-3 text-center w-12">No</th>
-                <th className="py-3 px-4 min-w-[200px]">Nama Santri & NISN</th>
+                <th className="py-3 px-4 min-w-[200px]">Nama Siswa & NISN</th>
                 <th className="py-3 px-2 text-center w-12">L/P</th>
                 <th className="py-3 px-4 text-center min-w-[130px]">Status Hari Ini</th>
                 <th className="py-3 px-3 text-center min-w-[60px]">H</th>

@@ -116,7 +116,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           group: 'Master Data & Database',
           items: [
             { id: 'kelola_pengguna', label: 'Input User & Pengguna', icon: <Users className="w-4 h-4" /> },
-            { id: 'kelola_siswa', label: 'Database Siswa (Santri)', icon: <GraduationCap className="w-4 h-4" /> },
+            { id: 'kelola_siswa', label: 'Database Siswa', icon: <GraduationCap className="w-4 h-4" /> },
             { id: 'kelola_kelas', label: 'Kelola Kelas & Rombel', icon: <Layers className="w-4 h-4" /> },
           ],
         },

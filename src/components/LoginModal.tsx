@@ -23,15 +23,19 @@ export const LoginModal: React.FC<LoginModalProps> = ({ users, onLoginSuccess })
 
     const found = users.find(
       (u) =>
-        (u.username.toLowerCase() === inputUser || (u.nip && u.nip.toLowerCase() === inputUser)) &&
-        (u.password === inputPass || !u.password || inputPass === '123')
+        u.username.toLowerCase() === inputUser ||
+        (u.nip && u.nip.toLowerCase() === inputUser)
     );
 
     if (found) {
-      onLoginSuccess(found);
-    } else {
-      setErrorMsg('Username / NIP atau kata sandi tidak valid. Pastikan data akun sudah terdaftar di sistem.');
+      const actualPassword = found.password || '123';
+      if (actualPassword === inputPass) {
+        onLoginSuccess(found);
+        return;
+      }
     }
+
+    setErrorMsg('Username / NIP atau kata sandi tidak valid. Pastikan data akun dan kata sandi sudah sesuai.');
   };
 
   return (

@@ -24,7 +24,7 @@ export const ImportModal: React.FC<ImportModalProps> = ({
 
   if (!isOpen) return null;
 
-  const title = type === 'students' ? 'Impor Data Siswa / Santri' : 'Impor Data Pengguna / Guru';
+  const title = type === 'students' ? 'Impor Data Siswa' : 'Impor Data Pengguna / Guru';
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const selected = e.target.files?.[0];

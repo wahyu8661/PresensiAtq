@@ -33,7 +33,7 @@ interface UserSettingsViewProps {
 
 export const UserSettingsView: React.FC<UserSettingsViewProps> = ({
   currentUser,
-  allUsers,
+  allUsers = [],
   classes,
   subjects,
   onSaveUserProfile,
@@ -46,6 +46,16 @@ export const UserSettingsView: React.FC<UserSettingsViewProps> = ({
   const [phone, setPhone] = useState(currentUser.phone || '');
   const [email, setEmail] = useState(currentUser.email || '');
   const [avatar, setAvatar] = useState<string | undefined>(currentUser.avatar);
+
+  // Sync state when currentUser updates
+  React.useEffect(() => {
+    setName(currentUser.name || '');
+    setUsername(currentUser.username || '');
+    setNip(currentUser.nip || '');
+    setPhone(currentUser.phone || '');
+    setEmail(currentUser.email || '');
+    setAvatar(currentUser.avatar);
+  }, [currentUser]);
 
   // Form State - Password Change
   const [currentPassword, setCurrentPassword] = useState('');

@@ -539,7 +539,7 @@ export const AttendanceForm: React.FC<AttendanceFormProps> = ({
             <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-100 border border-slate-200">
               <Users className="w-4 h-4 text-slate-600" />
               <span className="text-xs font-bold text-slate-700">Total:</span>
-              <span className="text-xs font-black text-slate-900">{stats.total} Santri</span>
+              <span className="text-xs font-black text-slate-900">{stats.total} Siswa</span>
             </div>
 
             <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800">

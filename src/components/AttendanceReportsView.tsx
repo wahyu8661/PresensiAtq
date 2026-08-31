@@ -191,7 +191,7 @@ export const AttendanceReportsView: React.FC<AttendanceReportsViewProps> = ({
             Rekapitulasi Kehadiran & Ekspor Spreadsheet
           </h2>
           <p className="text-xs text-slate-500 mt-1">
-            Unduh format Excel (.xlsx) resmi dengan data rekap per santri dan rincian jurnal jam pelajaran.
+            Unduh format Excel (.xlsx) resmi dengan data rekap per siswa dan rincian jurnal jam pelajaran.
           </p>
         </div>
 
@@ -363,7 +363,7 @@ export const AttendanceReportsView: React.FC<AttendanceReportsViewProps> = ({
               }`}
             >
               <Users className="w-3.5 h-3.5" />
-              <span>Rekapitulasi Santri ({targetStudents.length})</span>
+              <span>Rekapitulasi Siswa ({targetStudents.length})</span>
             </button>
 
             <button
@@ -385,7 +385,7 @@ export const AttendanceReportsView: React.FC<AttendanceReportsViewProps> = ({
               <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-2.5" />
               <input
                 type="text"
-                placeholder="Cari santri atau NISN..."
+                placeholder="Cari siswa atau NISN..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full pl-8 pr-3 py-1.5 bg-white border border-slate-200 rounded-xl text-xs text-slate-800 outline-hidden"
@@ -401,7 +401,7 @@ export const AttendanceReportsView: React.FC<AttendanceReportsViewProps> = ({
               <thead className="bg-slate-100 text-slate-800 font-bold border-b border-slate-200">
                 <tr>
                   <th className="py-3 px-3 text-center w-12">No</th>
-                  <th className="py-3 px-4 min-w-[200px]">Nama Santri & NISN</th>
+                  <th className="py-3 px-4 min-w-[200px]">Nama Siswa & NISN</th>
                   <th className="py-3 px-2 text-center w-12">L/P</th>
                   <th className="py-3 px-3 min-w-[130px]">Kelas</th>
                   <th className="py-3 px-3 text-center min-w-[60px]">Sesi</th>
@@ -417,7 +417,7 @@ export const AttendanceReportsView: React.FC<AttendanceReportsViewProps> = ({
                 {targetStudents.length === 0 ? (
                   <tr>
                     <td colSpan={11} className="py-12 text-center text-slate-400 font-semibold">
-                      Tidak ada santri yang sesuai kriteria filter.
+                      Tidak ada siswa yang sesuai kriteria filter.
                     </td>
                   </tr>
                 ) : (

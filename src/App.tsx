@@ -138,16 +138,20 @@ export default function App() {
   const handleSaveUser = (user: User) => {
     setUsers((prev) => {
       const idx = prev.findIndex((u) => u.id === user.id);
+      let updated: User[];
       if (idx >= 0) {
-        const updated = [...prev];
+        updated = [...prev];
         updated[idx] = user;
-        return updated;
+      } else {
+        updated = [...prev, user];
       }
-      return [...prev, user];
+      saveStoredUsers(updated);
+      return updated;
     });
     // If the saved user is the currently logged in user, keep session in sync
     if (currentUser && currentUser.id === user.id) {
       setCurrentUser(user);
+      saveStoredCurrentUser(user);
     }
   };
 
@@ -158,10 +162,14 @@ export default function App() {
 
   // Handler to Delete User
   const handleDeleteUser = (userId: string) => {
-    setUsers((prev) => prev.filter((u) => u.id !== userId));
+    setUsers((prev) => {
+      const nextUsers = prev.filter((u) => u.id !== userId);
+      saveStoredUsers(nextUsers);
+      return nextUsers;
+    });
   };
 
-  // Handler to Save / Update Student (Flowchart: CRUD Nama Ananda)
+  // Handler to Save / Update Student (Flowchart: CRUD Siswa)
   const handleSaveStudent = (student: Student) => {
     setStudents((prev) => {
       const idx = prev.findIndex((s) => s.id === student.id);
@@ -201,7 +209,7 @@ export default function App() {
   const handleImportDataSuccess = (importedData: any[], mode: 'append' | 'replace') => {
     if (importModalType === 'students') {
       setStudents((prev) => (mode === 'replace' ? importedData : [...prev, ...importedData]));
-      alert(`Berhasil mengimpor ${importedData.length} data santri!`);
+      alert(`Berhasil mengimpor ${importedData.length} data siswa!`);
     } else if (importModalType === 'users') {
       setUsers((prev) => (mode === 'replace' ? importedData : [...prev, ...importedData]));
       alert(`Berhasil mengimpor ${importedData.length} data pengguna!`);
@@ -286,13 +294,15 @@ export default function App() {
         {activeTab === 'pengaturan_akun' && (
           <UserSettingsView
             currentUser={currentUser}
+            allUsers={users}
             classes={classes}
             subjects={subjects}
-            onSaveProfile={handleSaveUserProfile}
+            onSaveUserProfile={handleSaveUserProfile}
+            onNavigateToUserManagement={() => setActiveTab('kelola_pengguna')}
           />
         )}
 
-        {/* TAB: ADMIN UTAMA (Dashboard, Kelola Pengguna/Input User Baru, Kelola Siswa/Santri, Kelola Kelas/Rombel) */}
+        {/* TAB: ADMIN UTAMA (Dashboard, Kelola Pengguna/Input User Baru, Kelola Siswa, Kelola Kelas/Rombel) */}
         {(activeTab === 'dashboard' ||
           activeTab === 'kelola_pengguna' ||
           activeTab === 'kelola_siswa' ||
