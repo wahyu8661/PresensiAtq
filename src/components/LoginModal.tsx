@@ -79,7 +79,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({ users, onLoginSuccess })
               id="login-username"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              placeholder="Contoh: admin / walikelas7ikhwan / gurumapel"
+              placeholder="Contoh: wahyu / ramlan / kusmanto / bundalilis / ayahrozi"
               required
               autoFocus
               className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-900 placeholder:text-slate-400 focus:bg-white focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-hidden transition-all"
@@ -127,18 +127,43 @@ export const LoginModal: React.FC<LoginModalProps> = ({ users, onLoginSuccess })
           </button>
 
           {showHelper && (
-            <div className="mt-2 p-3 bg-slate-50 border border-slate-200 rounded-xl text-[11px] text-slate-600 space-y-1.5">
-              <p className="font-bold text-slate-800">Daftar Akun Bawaan (Password default: 123):</p>
-              <ul className="space-y-1 text-slate-700">
-                <li>• <strong className="text-rose-700">Admin Utama</strong>: username <code className="bg-slate-200 px-1 py-0.5 rounded text-[10px] font-mono">admin</code></li>
-                <li>• <strong className="text-amber-700">Wali Kelas VII Ikhwan</strong>: username <code className="bg-slate-200 px-1 py-0.5 rounded text-[10px] font-mono">walikelas7ikhwan</code></li>
-                <li>• <strong className="text-amber-700">Wali Kelas VII Akhwat</strong>: username <code className="bg-slate-200 px-1 py-0.5 rounded text-[10px] font-mono">walikelas7akhwat</code></li>
-                <li>• <strong className="text-emerald-700">Guru Mapel Matematika</strong>: username <code className="bg-slate-200 px-1 py-0.5 rounded text-[10px] font-mono">gurumapel</code></li>
-                <li>• <strong className="text-emerald-700">Guru Mapel Tahfidz</strong>: username <code className="bg-slate-200 px-1 py-0.5 rounded text-[10px] font-mono">gurutahfidz</code></li>
-              </ul>
-              <p className="text-[10px] text-slate-400 pt-1">
-                Admin Utama dapat mendaftarkan akun guru baru dengan multi-peran (Admin, Wali Kelas, Guru Mapel).
-              </p>
+            <div className="mt-2 p-3 bg-slate-50 border border-slate-200 rounded-xl text-[11px] text-slate-600 space-y-1.5 max-h-60 overflow-y-auto">
+              <p className="font-bold text-slate-800">Daftar Akun Database Semester I 2026-2027 (Password: 123):</p>
+              <div className="space-y-1 text-slate-700">
+                <p className="font-semibold text-rose-700 text-[10px] uppercase tracking-wider pt-1">👑 Admin Utama (Multi-Peran):</p>
+                <ul className="space-y-0.5 pl-2">
+                  <li>• Wahyu Dwi Prasetyo: <code className="bg-slate-200 px-1 py-0.5 rounded text-[10px] font-mono">wahyu</code></li>
+                  <li>• Ramlan: <code className="bg-slate-200 px-1 py-0.5 rounded text-[10px] font-mono">ramlan</code></li>
+                  <li>• Kusmanto: <code className="bg-slate-200 px-1 py-0.5 rounded text-[10px] font-mono">kusmanto</code></li>
+                </ul>
+
+                <p className="font-semibold text-amber-700 text-[10px] uppercase tracking-wider pt-1">🎓 Wali Kelas & Guru Mapel:</p>
+                <ul className="space-y-0.5 pl-2">
+                  <li>• VII-Abu Bakar (Lilis Kurniawati): <code className="bg-slate-200 px-1 py-0.5 rounded text-[10px] font-mono">bundalilis</code></li>
+                  <li>• VII-Fatimah (Refi Febrianti): <code className="bg-slate-200 px-1 py-0.5 rounded text-[10px] font-mono">bundarefi</code></li>
+                  <li>• VIII-Umar (Reza Pahlepi): <code className="bg-slate-200 px-1 py-0.5 rounded text-[10px] font-mono">ayahreza</code></li>
+                  <li>• VIII-Maryam (Fazaria Iztayanizar): <code className="bg-slate-200 px-1 py-0.5 rounded text-[10px] font-mono">bundafaza</code></li>
+                  <li>• VIII-Ruqayyah (Dea Rians): <code className="bg-slate-200 px-1 py-0.5 rounded text-[10px] font-mono">bundadea</code></li>
+                  <li>• IX-Utsman (Eka Fitriana): <code className="bg-slate-200 px-1 py-0.5 rounded text-[10px] font-mono">bundaekaf</code></li>
+                  <li>• IX-Khadijah (Eva Yulianti): <code className="bg-slate-200 px-1 py-0.5 rounded text-[10px] font-mono">bundaeva</code></li>
+                  <li>• X-Ali (Junara Arianto): <code className="bg-slate-200 px-1 py-0.5 rounded text-[10px] font-mono">ayahjun</code></li>
+                  <li>• X-Aisyah (Fitri Andriyani): <code className="bg-slate-200 px-1 py-0.5 rounded text-[10px] font-mono">bundafitrias</code></li>
+                  <li>• XI-Thalhah (Fatkhurozi): <code className="bg-slate-200 px-1 py-0.5 rounded text-[10px] font-mono">ayahrozi</code></li>
+                  <li>• XI-Sumayyah (Maulani Saqinah): <code className="bg-slate-200 px-1 py-0.5 rounded text-[10px] font-mono">bundalani</code></li>
+                  <li>• XII-Sa'ad (Faisal): <code className="bg-slate-200 px-1 py-0.5 rounded text-[10px] font-mono">ayahfaisal</code></li>
+                  <li>• XII-Hafshah (Ria Astuti): <code className="bg-slate-200 px-1 py-0.5 rounded text-[10px] font-mono">bundariaastuti</code></li>
+                </ul>
+
+                <p className="font-semibold text-emerald-700 text-[10px] uppercase tracking-wider pt-1">📖 Guru Mapel Lainnya:</p>
+                <ul className="space-y-0.5 pl-2">
+                  <li>• Abdullah Cholis: <code className="bg-slate-200 px-1 py-0.5 rounded text-[10px] font-mono">abdullahcholis</code></li>
+                  <li>• Rina: <code className="bg-slate-200 px-1 py-0.5 rounded text-[10px] font-mono">rinash</code></li>
+                  <li>• Oktaviani: <code className="bg-slate-200 px-1 py-0.5 rounded text-[10px] font-mono">oktaviani</code></li>
+                  <li>• Ade Irma: <code className="bg-slate-200 px-1 py-0.5 rounded text-[10px] font-mono">adeirma</code></li>
+                  <li>• Mona Suci: <code className="bg-slate-200 px-1 py-0.5 rounded text-[10px] font-mono">monasuci</code></li>
+                  <li>• Trisyanto: <code className="bg-slate-200 px-1 py-0.5 rounded text-[10px] font-mono">trisyanto</code></li>
+                </ul>
+              </div>
             </div>
           )}
         </div>
