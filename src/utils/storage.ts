@@ -9,13 +9,13 @@ import {
 } from '../data/initialData';
 
 const STORAGE_KEYS = {
-  USERS: 'attaufiq_presensi_users_v4_2026',
-  STUDENTS: 'attaufiq_presensi_students_v4_2026',
-  CLASSES: 'attaufiq_presensi_classes_v4_2026',
-  SUBJECTS: 'attaufiq_presensi_subjects_v4_2026',
-  PERIODS: 'attaufiq_presensi_periods_v4_2026',
-  RECORDS: 'attaufiq_presensi_records_v4_2026',
-  CURRENT_USER: 'attaufiq_presensi_curr_user_v4_2026',
+  USERS: 'attaufiq_presensi_users_v5_resmi_spreadsheet',
+  STUDENTS: 'attaufiq_presensi_students_v5_resmi_spreadsheet',
+  CLASSES: 'attaufiq_presensi_classes_v5_resmi_spreadsheet',
+  SUBJECTS: 'attaufiq_presensi_subjects_v5_resmi_spreadsheet',
+  PERIODS: 'attaufiq_presensi_periods_v5_resmi_spreadsheet',
+  RECORDS: 'attaufiq_presensi_records_v5_resmi_spreadsheet',
+  CURRENT_USER: 'attaufiq_presensi_curr_user_v5_resmi_spreadsheet',
 };
 
 export const getStoredUsers = (): User[] => {
