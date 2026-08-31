@@ -6,6 +6,7 @@ import {
   Subject,
   PeriodSlot,
   AttendanceRecord,
+  UserRole,
 } from './types';
 import {
   getStoredUsers,
@@ -22,7 +23,6 @@ import {
   saveStoredAttendanceRecords,
   getStoredCurrentUser,
   saveStoredCurrentUser,
-  resetAllDataToDefault,
 } from './utils/storage';
 import { Navbar } from './components/Navbar';
 import { LoginModal } from './components/LoginModal';
@@ -45,7 +45,7 @@ export default function App() {
   const [currentUser, setCurrentUser] = useState<User | null>(getStoredCurrentUser);
 
   // App UI State
-  const [activeTab, setActiveTab] = useState<string>('input_presensi');
+  const [activeTab, setActiveTab] = useState<string>('dashboard');
   const [importModalType, setImportModalType] = useState<'students' | 'users' | null>(null);
   const [selectedStudentForDetail, setSelectedStudentForDetail] = useState<Student | null>(null);
 
@@ -80,17 +80,36 @@ export default function App() {
     }
   }, [currentUser]);
 
-  // Set default initial tab based on role
-  useEffect(() => {
-    if (!currentUser) return;
-    if (currentUser.role === 'admin') {
+  // Set default initial tab based on role according to the Flowchart:
+  // Admin Utama -> dashboard
+  // Wali Kelas -> wali_dashboard
+  // Guru Mapel -> guru_dashboard
+  const navigateByRole = (user: User) => {
+    if (user.role === 'admin') {
       setActiveTab('dashboard');
-    } else if (currentUser.role === 'wali_kelas') {
+    } else if (user.role === 'wali_kelas') {
       setActiveTab('wali_dashboard');
     } else {
       setActiveTab('guru_dashboard');
     }
-  }, [currentUser?.id, currentUser?.role]);
+  };
+
+  const handleLoginSuccess = (user: User) => {
+    setCurrentUser(user);
+    navigateByRole(user);
+  };
+
+  const handleLogout = () => {
+    setCurrentUser(null);
+  };
+
+  // Handler to switch active role within the user's assigned roles
+  const handleChangeActiveRole = (newRole: UserRole) => {
+    if (!currentUser) return;
+    const updatedUser = { ...currentUser, role: newRole };
+    setCurrentUser(updatedUser);
+    navigateByRole(updatedUser);
+  };
 
   // Handler to Save Attendance Record (Add or Update)
   const handleSaveAttendanceRecord = (newRecord: AttendanceRecord) => {
@@ -114,7 +133,7 @@ export default function App() {
     });
   };
 
-  // Handler to Save / Update User
+  // Handler to Save / Update User (Flowchart: Input user baru)
   const handleSaveUser = (user: User) => {
     setUsers((prev) => {
       const idx = prev.findIndex((u) => u.id === user.id);
@@ -132,7 +151,7 @@ export default function App() {
     setUsers((prev) => prev.filter((u) => u.id !== userId));
   };
 
-  // Handler to Save / Update Student
+  // Handler to Save / Update Student (Flowchart: CRUD Nama Ananda)
   const handleSaveStudent = (student: Student) => {
     setStudents((prev) => {
       const idx = prev.findIndex((s) => s.id === student.id);
@@ -150,6 +169,24 @@ export default function App() {
     setStudents((prev) => prev.filter((s) => s.id !== studentId));
   };
 
+  // Handler to Save / Update Class (Flowchart: CRUD Kelas)
+  const handleSaveClass = (classRoom: ClassRoom) => {
+    setClasses((prev) => {
+      const idx = prev.findIndex((c) => c.id === classRoom.id);
+      if (idx >= 0) {
+        const updated = [...prev];
+        updated[idx] = classRoom;
+        return updated;
+      }
+      return [...prev, classRoom];
+    });
+  };
+
+  // Handler to Delete Class
+  const handleDeleteClass = (classId: string) => {
+    setClasses((prev) => prev.filter((c) => c.id !== classId));
+  };
+
   // Handler for Excel Import Confirmation
   const handleImportDataSuccess = (importedData: any[], mode: 'append' | 'replace') => {
     if (importModalType === 'students') {
@@ -161,34 +198,9 @@ export default function App() {
     }
   };
 
-  // Handler to Switch User
-  const handleSwitchUser = (user: User) => {
-    setCurrentUser(user);
-    if (user.role === 'admin') {
-      setActiveTab('dashboard');
-    } else if (user.role === 'wali_kelas') {
-      setActiveTab('wali_dashboard');
-    } else {
-      setActiveTab('guru_dashboard');
-    }
-  };
-
-  // Handler for Resetting all Mock Data
-  const handleResetData = () => {
-    resetAllDataToDefault();
-    setUsers(getStoredUsers());
-    setStudents(getStoredStudents());
-    setClasses(getStoredClasses());
-    setSubjects(getStoredSubjects());
-    setPeriods(getStoredPeriods());
-    setRecords(getStoredAttendanceRecords());
-    setCurrentUser(getStoredCurrentUser());
-    setActiveTab('dashboard');
-  };
-
-  // If not logged in, show Login Screen
+  // If not logged in, show Login Screen (Username & Password)
   if (!currentUser) {
-    return <LoginModal users={users} onLoginSuccess={(user) => setCurrentUser(user)} />;
+    return <LoginModal users={users} onLoginSuccess={handleLoginSuccess} />;
   }
 
   return (
@@ -196,14 +208,12 @@ export default function App() {
       {/* Sleek Sidebar & Top Navigation Layout */}
       <Navbar
         currentUser={currentUser}
-        onSwitchUser={handleSwitchUser}
-        availableUsers={users}
+        onChangeActiveRole={handleChangeActiveRole}
         activeTab={activeTab}
         onSelectTab={(tab) => setActiveTab(tab)}
-        onLogout={() => setCurrentUser(null)}
-        onResetData={handleResetData}
+        onLogout={handleLogout}
       >
-        {/* TAB 1: FORM INPUT PRESENSI (Jam 1 s/d Jam 9) */}
+        {/* TAB: FORM INPUT PRESENSI (Jam 1 s/d Jam 9) */}
         {activeTab === 'input_presensi' && (
           <AttendanceForm
             currentUser={currentUser}
@@ -217,7 +227,7 @@ export default function App() {
           />
         )}
 
-        {/* TAB 2: PORTAL WALI KELAS (Pantau Kelas Binaan) */}
+        {/* TAB: PORTAL WALI KELAS (Memantau Kelas & Melihat Riwayat) */}
         {activeTab === 'wali_dashboard' && (
           <WaliKelasView
             currentUser={currentUser}
@@ -233,7 +243,7 @@ export default function App() {
           />
         )}
 
-        {/* TAB 3: PORTAL GURU MAPEL (Presensi & Jadwal Mapel) */}
+        {/* TAB: PORTAL GURU MAPEL (Presensi Berdasarkan Jam Mapel) */}
         {activeTab === 'guru_dashboard' && (
           <GuruMapelView
             currentUser={currentUser}
@@ -248,7 +258,7 @@ export default function App() {
           />
         )}
 
-        {/* TAB 4: REKAPITULASI & EKSPOR EXCEL */}
+        {/* TAB: REKAPITULASI & EKSPOR EXCEL (Download Data Presensi) */}
         {activeTab === 'rekap_presensi' && (
           <AttendanceReportsView
             students={students}
@@ -262,8 +272,11 @@ export default function App() {
           />
         )}
 
-        {/* TAB 5: ADMIN DASHBOARD (Overview, Kelola Pengguna, Kelola Siswa) */}
-        {(activeTab === 'dashboard' || activeTab === 'kelola_pengguna' || activeTab === 'kelola_siswa') && (
+        {/* TAB: ADMIN UTAMA (Dashboard, Kelola Pengguna/Input User Baru, Kelola Siswa/Santri, Kelola Kelas/Rombel) */}
+        {(activeTab === 'dashboard' ||
+          activeTab === 'kelola_pengguna' ||
+          activeTab === 'kelola_siswa' ||
+          activeTab === 'kelola_kelas') && (
           <AdminDashboard
             currentUser={currentUser}
             users={users}
@@ -272,10 +285,13 @@ export default function App() {
             subjects={subjects}
             periods={periods}
             records={records}
+            activeTabKey={activeTab}
             onSaveUser={handleSaveUser}
             onDeleteUser={handleDeleteUser}
             onSaveStudent={handleSaveStudent}
             onDeleteStudent={handleDeleteStudent}
+            onSaveClass={handleSaveClass}
+            onDeleteClass={handleDeleteClass}
             onOpenImportModal={(type) => setImportModalType(type)}
             onNavigateToForm={() => setActiveTab('input_presensi')}
           />

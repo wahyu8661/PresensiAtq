@@ -9,13 +9,13 @@ import {
 } from '../data/initialData';
 
 const STORAGE_KEYS = {
-  USERS: 'attaufiq_presensi_users_v1',
-  STUDENTS: 'attaufiq_presensi_students_v1',
-  CLASSES: 'attaufiq_presensi_classes_v1',
-  SUBJECTS: 'attaufiq_presensi_subjects_v1',
-  PERIODS: 'attaufiq_presensi_periods_v1',
-  RECORDS: 'attaufiq_presensi_records_v1',
-  CURRENT_USER: 'attaufiq_presensi_curr_user_v1',
+  USERS: 'attaufiq_presensi_users_v2_spreadsheet',
+  STUDENTS: 'attaufiq_presensi_students_v2_spreadsheet',
+  CLASSES: 'attaufiq_presensi_classes_v2_spreadsheet',
+  SUBJECTS: 'attaufiq_presensi_subjects_v2_spreadsheet',
+  PERIODS: 'attaufiq_presensi_periods_v2_spreadsheet',
+  RECORDS: 'attaufiq_presensi_records_v2_spreadsheet',
+  CURRENT_USER: 'attaufiq_presensi_curr_user_v2_spreadsheet',
 };
 
 export const getStoredUsers = (): User[] => {

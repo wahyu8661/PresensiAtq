@@ -8,15 +8,16 @@ export interface User {
   password?: string;
   name: string;
   role: UserRole;
+  roles?: UserRole[]; // Array of assigned positions (e.g. ['admin', 'wali_kelas', 'guru_mapel'])
   nip?: string;
   email?: string;
   phone?: string;
   avatar?: string;
   // Specific for Wali Kelas:
-  assignedClassId?: string; // e.g. "7A"
+  assignedClassId?: string; // e.g. "7-ikhwan"
   // Specific for Guru Mapel:
   assignedSubjectIds?: string[]; // e.g. ["matematika", "ipa"]
-  assignedClassIds?: string[]; // e.g. ["7A", "7B", "8A"]
+  assignedClassIds?: string[]; // e.g. ["7-ikhwan", "7-akhwat"]
 }
 
 export interface Student {

@@ -8,42 +8,34 @@ import {
   Calendar,
   Clock,
   LogOut,
-  ChevronDown,
   UserCheck,
   FileSpreadsheet,
   Users,
   Building2,
-  CheckCircle2,
-  RefreshCw,
   Menu,
   X,
-  Sparkles,
+  Layers,
 } from 'lucide-react';
 
 interface NavbarProps {
   currentUser: User;
-  onSwitchUser: (user: User) => void;
-  availableUsers: User[];
+  onChangeActiveRole?: (role: UserRole) => void;
   activeTab: string;
   onSelectTab: (tab: string) => void;
   onLogout: () => void;
-  onResetData: () => void;
   children?: React.ReactNode;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
   currentUser,
-  onSwitchUser,
-  availableUsers,
+  onChangeActiveRole,
   activeTab,
   onSelectTab,
   onLogout,
-  onResetData,
   children,
 }) => {
   const [timeStr, setTimeStr] = useState<string>('');
   const [dateStr, setDateStr] = useState<string>('');
-  const [showSwitchModal, setShowSwitchModal] = useState<boolean>(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState<boolean>(false);
 
   useEffect(() => {
@@ -81,16 +73,16 @@ export const Navbar: React.FC<NavbarProps> = ({
         };
       case 'wali_kelas':
         return {
-          label: `Wali Kelas ${currentUser.assignedClassId || ''}`,
+          label: `Wali Kelas ${currentUser.assignedClassId ? `(${currentUser.assignedClassId})` : ''}`,
           color: 'bg-amber-500/20 text-amber-300 border-amber-500/30',
           badgeLight: 'bg-amber-50 text-amber-800 border-amber-200',
           icon: <GraduationCap className="w-3.5 h-3.5 mr-1" />,
         };
       case 'guru_mapel':
         return {
-          label: 'Guru Spesialis / Mapel',
-          color: 'bg-blue-500/20 text-blue-300 border-blue-500/30',
-          badgeLight: 'bg-blue-50 text-blue-800 border-blue-200',
+          label: 'Guru Mapel',
+          color: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30',
+          badgeLight: 'bg-emerald-50 text-emerald-800 border-emerald-200',
           icon: <BookOpen className="w-3.5 h-3.5 mr-1" />,
         };
       default:
@@ -104,13 +96,15 @@ export const Navbar: React.FC<NavbarProps> = ({
   };
 
   const roleBadge = getRoleBadge(currentUser.role);
+  const userRoles = currentUser.roles || [currentUser.role];
+  const hasMultipleRoles = userRoles.length > 1;
 
-  // Dynamic Navigation Tabs based on Role
+  // Dynamic Navigation Tabs aligned with the Flowchart
   const getNavTabs = () => {
     if (currentUser.role === 'admin') {
       return [
         {
-          group: 'Utama',
+          group: 'Menu Admin Utama',
           items: [
             { id: 'dashboard', label: 'Dashboard & Statistik', icon: <Building2 className="w-4 h-4" /> },
             { id: 'input_presensi', label: 'Input Presensi (Jam 1-9)', icon: <UserCheck className="w-4 h-4" /> },
@@ -118,10 +112,11 @@ export const Navbar: React.FC<NavbarProps> = ({
           ],
         },
         {
-          group: 'Master Data',
+          group: 'Master Data & Database',
           items: [
-            { id: 'kelola_pengguna', label: 'Data Pengguna / Guru', icon: <Users className="w-4 h-4" /> },
-            { id: 'kelola_siswa', label: 'Data Siswa & Kelas', icon: <GraduationCap className="w-4 h-4" /> },
+            { id: 'kelola_pengguna', label: 'Input User & Pengguna', icon: <Users className="w-4 h-4" /> },
+            { id: 'kelola_siswa', label: 'Database Siswa (Santri)', icon: <GraduationCap className="w-4 h-4" /> },
+            { id: 'kelola_kelas', label: 'Kelola Kelas & Rombel', icon: <Layers className="w-4 h-4" /> },
           ],
         },
       ];
@@ -132,11 +127,11 @@ export const Navbar: React.FC<NavbarProps> = ({
           items: [
             {
               id: 'wali_dashboard',
-              label: `Pantau Kelas (${currentUser.assignedClassId || 'Binaan'})`,
+              label: 'Pantau Kelas & Riwayat',
               icon: <GraduationCap className="w-4 h-4" />,
             },
-            { id: 'input_presensi', label: 'Isi Presensi Kelas', icon: <UserCheck className="w-4 h-4" /> },
-            { id: 'rekap_presensi', label: 'Rekap Presensi Kelas', icon: <FileSpreadsheet className="w-4 h-4" /> },
+            { id: 'input_presensi', label: 'Mengisi Presensi Kelas', icon: <UserCheck className="w-4 h-4" /> },
+            { id: 'rekap_presensi', label: 'Download Data Presensi', icon: <FileSpreadsheet className="w-4 h-4" /> },
           ],
         },
       ];
@@ -144,10 +139,10 @@ export const Navbar: React.FC<NavbarProps> = ({
       // Guru Mapel
       return [
         {
-          group: 'Menu Guru Spesialis',
+          group: 'Menu Guru Mapel',
           items: [
-            { id: 'guru_dashboard', label: 'Presensi & Jadwal Mapel', icon: <BookOpen className="w-4 h-4" /> },
-            { id: 'input_presensi', label: 'Isi Presensi Jam Mapel', icon: <UserCheck className="w-4 h-4" /> },
+            { id: 'guru_dashboard', label: 'Jadwal & Presensi Mapel', icon: <BookOpen className="w-4 h-4" /> },
+            { id: 'input_presensi', label: 'Presensi Jam Mapel', icon: <UserCheck className="w-4 h-4" /> },
             { id: 'rekap_presensi', label: 'Riwayat & Rekap Mapel', icon: <FileSpreadsheet className="w-4 h-4" /> },
           ],
         },
@@ -185,6 +180,32 @@ export const Navbar: React.FC<NavbarProps> = ({
           </div>
         </div>
 
+        {/* Multi-Role Switcher Pill (Only if user has more than 1 assigned position) */}
+        {hasMultipleRoles && (
+          <div className="p-3 bg-slate-950/80 border-b border-slate-800/80">
+            <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5 flex items-center gap-1">
+              <Layers className="w-3 h-3 text-blue-400" />
+              <span>Pilih Peran Aktif:</span>
+            </label>
+            <div className="grid grid-cols-2 gap-1.5">
+              {userRoles.map((r) => (
+                <button
+                  key={r}
+                  type="button"
+                  onClick={() => onChangeActiveRole && onChangeActiveRole(r)}
+                  className={`px-2 py-1.5 rounded-lg text-[11px] font-bold text-center transition-all ${
+                    currentUser.role === r
+                      ? 'bg-blue-600 text-white shadow-xs'
+                      : 'bg-slate-800 hover:bg-slate-700 text-slate-300'
+                  }`}
+                >
+                  {r === 'admin' ? 'Admin' : r === 'wali_kelas' ? 'Wali Kelas' : 'Guru Mapel'}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
         {/* Navigation Group Items */}
         <div className="flex-1 px-3 py-4 space-y-6 overflow-y-auto">
           {navGroups.map((group, gIdx) => (
@@ -201,13 +222,13 @@ export const Navbar: React.FC<NavbarProps> = ({
                       id={`sidebar-tab-${item.id}`}
                       type="button"
                       onClick={() => onSelectTab(item.id)}
-                      className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-semibold transition-all ${
+                      className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition-all ${
                         isActive
-                          ? 'bg-blue-600 text-white shadow-sm shadow-blue-500/20 font-bold'
+                          ? 'bg-[#1b357f] text-white shadow-sm font-bold ring-1 ring-white/10'
                           : 'text-slate-400 hover:text-slate-100 hover:bg-slate-800/80'
                       }`}
                     >
-                      <span className={`${isActive ? 'text-white' : 'text-slate-400'}`}>{item.icon}</span>
+                      <span className={`${isActive ? 'text-blue-300' : 'text-slate-400'}`}>{item.icon}</span>
                       <span className="truncate">{item.label}</span>
                     </button>
                   );
@@ -215,82 +236,13 @@ export const Navbar: React.FC<NavbarProps> = ({
               </div>
             </div>
           ))}
-
-          {/* Quick Demo Switcher Section in Sidebar */}
-          <div className="pt-2 border-t border-slate-800/80">
-            <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest px-3 mb-2 flex items-center justify-between">
-              <span>Ganti Akun Cepat</span>
-              <Sparkles className="w-3 h-3 text-amber-400" />
-            </div>
-            <div className="grid grid-cols-1 gap-1.5 px-1">
-              <button
-                type="button"
-                id="sidebar-quick-admin"
-                onClick={() => {
-                  const admin = availableUsers.find((u) => u.role === 'admin');
-                  if (admin) onSwitchUser(admin);
-                }}
-                className={`w-full text-left px-2.5 py-1.5 rounded-md text-[11px] font-semibold flex items-center justify-between transition-all ${
-                  currentUser.role === 'admin'
-                    ? 'bg-rose-500/20 text-rose-300 border border-rose-500/40'
-                    : 'text-slate-400 hover:bg-slate-800/60 hover:text-slate-200'
-                }`}
-              >
-                <span className="flex items-center gap-1.5">
-                  <ShieldCheck className="w-3.5 h-3.5 text-rose-400" />
-                  Admin Utama
-                </span>
-                {currentUser.role === 'admin' && <span className="text-[9px] text-rose-300">● Aktif</span>}
-              </button>
-
-              <button
-                type="button"
-                id="sidebar-quick-wali"
-                onClick={() => {
-                  const wali = availableUsers.find((u) => u.role === 'wali_kelas');
-                  if (wali) onSwitchUser(wali);
-                }}
-                className={`w-full text-left px-2.5 py-1.5 rounded-md text-[11px] font-semibold flex items-center justify-between transition-all ${
-                  currentUser.role === 'wali_kelas'
-                    ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40'
-                    : 'text-slate-400 hover:bg-slate-800/60 hover:text-slate-200'
-                }`}
-              >
-                <span className="flex items-center gap-1.5">
-                  <GraduationCap className="w-3.5 h-3.5 text-amber-400" />
-                  Wali Kelas 7A
-                </span>
-                {currentUser.role === 'wali_kelas' && <span className="text-[9px] text-amber-300">● Aktif</span>}
-              </button>
-
-              <button
-                type="button"
-                id="sidebar-quick-guru"
-                onClick={() => {
-                  const guru = availableUsers.find((u) => u.role === 'guru_mapel');
-                  if (guru) onSwitchUser(guru);
-                }}
-                className={`w-full text-left px-2.5 py-1.5 rounded-md text-[11px] font-semibold flex items-center justify-between transition-all ${
-                  currentUser.role === 'guru_mapel'
-                    ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40'
-                    : 'text-slate-400 hover:bg-slate-800/60 hover:text-slate-200'
-                }`}
-              >
-                <span className="flex items-center gap-1.5">
-                  <BookOpen className="w-3.5 h-3.5 text-emerald-400" />
-                  Guru Mapel
-                </span>
-                {currentUser.role === 'guru_mapel' && <span className="text-[9px] text-emerald-300">● Aktif</span>}
-              </button>
-            </div>
-          </div>
         </div>
 
-        {/* User Card Footer */}
+        {/* User Profile & Logout Footer */}
         <div className="p-3 bg-slate-950 border-t border-slate-800">
-          <div className="flex items-center justify-between gap-2 p-2 rounded-lg bg-slate-900 border border-slate-800">
+          <div className="flex items-center justify-between gap-2 p-2 rounded-xl bg-slate-900 border border-slate-800">
             <div className="flex items-center gap-2.5 min-w-0">
-              <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-blue-600 to-cyan-500 flex items-center justify-center text-white font-bold text-xs shrink-0 shadow-xs">
+              <div className="w-8 h-8 rounded-full bg-[#1b357f] text-white flex items-center justify-center font-bold text-xs shrink-0 shadow-xs">
                 {currentUser.name.slice(0, 2).toUpperCase()}
               </div>
               <div className="min-w-0">
@@ -302,8 +254,8 @@ export const Navbar: React.FC<NavbarProps> = ({
               type="button"
               id="sidebar-logout-btn"
               onClick={onLogout}
-              title="Keluar"
-              className="p-1.5 text-slate-400 hover:text-rose-400 hover:bg-slate-800 rounded transition-colors"
+              title="Keluar / Logout"
+              className="p-1.5 text-slate-400 hover:text-rose-400 hover:bg-slate-800 rounded-lg transition-colors cursor-pointer"
             >
               <LogOut className="w-4 h-4" />
             </button>
@@ -333,6 +285,33 @@ export const Navbar: React.FC<NavbarProps> = ({
               </button>
             </div>
 
+            {hasMultipleRoles && (
+              <div className="p-3 bg-slate-950/80 border-b border-slate-800/80">
+                <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">
+                  Pilih Peran Aktif:
+                </label>
+                <div className="grid grid-cols-2 gap-1.5">
+                  {userRoles.map((r) => (
+                    <button
+                      key={r}
+                      type="button"
+                      onClick={() => {
+                        onChangeActiveRole && onChangeActiveRole(r);
+                        setIsMobileMenuOpen(false);
+                      }}
+                      className={`px-2 py-1.5 rounded-lg text-[11px] font-bold text-center ${
+                        currentUser.role === r
+                          ? 'bg-blue-600 text-white'
+                          : 'bg-slate-800 text-slate-300'
+                      }`}
+                    >
+                      {r === 'admin' ? 'Admin' : r === 'wali_kelas' ? 'Wali Kelas' : 'Guru Mapel'}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
             <div className="flex-1 px-3 py-4 space-y-6 overflow-y-auto">
               {navGroups.map((group, gIdx) => (
                 <div key={gIdx}>
@@ -350,9 +329,9 @@ export const Navbar: React.FC<NavbarProps> = ({
                             onSelectTab(item.id);
                             setIsMobileMenuOpen(false);
                           }}
-                          className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-semibold transition-all ${
+                          className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition-all ${
                             isActive
-                              ? 'bg-blue-600 text-white shadow-xs font-bold'
+                              ? 'bg-[#1b357f] text-white shadow-xs font-bold'
                               : 'text-slate-400 hover:text-slate-100 hover:bg-slate-800'
                           }`}
                         >
@@ -367,9 +346,9 @@ export const Navbar: React.FC<NavbarProps> = ({
             </div>
 
             <div className="p-3 bg-slate-950 border-t border-slate-800">
-              <div className="flex items-center justify-between gap-2 p-2 rounded-lg bg-slate-900 border border-slate-800">
+              <div className="flex items-center justify-between gap-2 p-2 rounded-xl bg-slate-900 border border-slate-800">
                 <div className="flex items-center gap-2.5 min-w-0">
-                  <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-blue-600 to-cyan-500 flex items-center justify-center text-white font-bold text-xs shrink-0">
+                  <div className="w-8 h-8 rounded-full bg-[#1b357f] text-white flex items-center justify-center font-bold text-xs shrink-0">
                     {currentUser.name.slice(0, 2).toUpperCase()}
                   </div>
                   <div className="min-w-0">
@@ -380,7 +359,8 @@ export const Navbar: React.FC<NavbarProps> = ({
                 <button
                   type="button"
                   onClick={onLogout}
-                  className="p-1.5 text-slate-400 hover:text-rose-400 rounded"
+                  className="p-1.5 text-slate-400 hover:text-rose-400 rounded-lg"
+                  title="Keluar"
                 >
                   <LogOut className="w-4 h-4" />
                 </button>
@@ -403,7 +383,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               type="button"
               id="mobile-menu-toggle"
               onClick={() => setIsMobileMenuOpen(true)}
-              className="md:hidden p-2 rounded-lg text-slate-600 hover:bg-slate-100 border border-slate-200"
+              className="md:hidden p-2 rounded-xl text-slate-600 hover:bg-slate-100 border border-slate-200"
             >
               <Menu className="w-5 h-5" />
             </button>
@@ -415,10 +395,10 @@ export const Navbar: React.FC<NavbarProps> = ({
             </div>
           </div>
 
-          {/* Right Side: Live Clock, Switch User Button & Profile Pill */}
+          {/* Right Side: Live Clock, Profile Pill & Logout Button */}
           <div className="flex items-center gap-2.5 sm:gap-4">
             {/* Live Date & Time Badge */}
-            <div className="hidden lg:flex items-center gap-2 text-xs bg-slate-50 border border-slate-200 px-3 py-1.5 rounded-lg text-slate-600">
+            <div className="hidden lg:flex items-center gap-2 text-xs bg-slate-50 border border-slate-200 px-3 py-1.5 rounded-xl text-slate-600">
               <span className="flex items-center gap-1.5 font-medium">
                 <Calendar className="w-3.5 h-3.5 text-blue-600" />
                 {dateStr}
@@ -430,37 +410,27 @@ export const Navbar: React.FC<NavbarProps> = ({
               </span>
             </div>
 
-            {/* Reset Demo Button */}
-            <button
-              type="button"
-              id="btn-reset-demo-data"
-              onClick={() => {
-                if (window.confirm('Kembalikan seluruh data presensi, siswa, dan guru ke data contoh awal?')) {
-                  onResetData();
-                }
-              }}
-              title="Reset ke Data Contoh Awal"
-              className="hidden sm:flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-slate-200 text-slate-600 hover:text-slate-900 hover:bg-slate-50 text-xs font-semibold transition-all"
-            >
-              <RefreshCw className="w-3.5 h-3.5 text-slate-500" />
-              <span className="hidden xl:inline">Reset Demo</span>
-            </button>
-
-            {/* Switch User Button */}
-            <button
-              type="button"
-              id="btn-open-switch-user"
-              onClick={() => setShowSwitchModal(true)}
-              className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-50 border border-slate-200 hover:border-slate-300 hover:bg-slate-100 transition-all text-xs font-semibold text-slate-700"
-            >
-              <div className="w-6 h-6 rounded-full bg-blue-600 text-white flex items-center justify-center text-[10px] font-bold">
+            {/* Profile Info Badge */}
+            <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-50 border border-slate-200 text-xs font-semibold text-slate-700">
+              <div className="w-6 h-6 rounded-full bg-[#1b357f] text-white flex items-center justify-center text-[10px] font-bold">
                 {currentUser.name.slice(0, 2).toUpperCase()}
               </div>
               <div className="hidden sm:block text-left">
-                <div className="leading-tight font-bold text-slate-800 truncate max-w-[120px]">{currentUser.name}</div>
+                <div className="leading-tight font-bold text-slate-800 truncate max-w-[140px]">{currentUser.name}</div>
                 <div className="text-[10px] text-slate-500 leading-tight">{roleBadge.label}</div>
               </div>
-              <ChevronDown className="w-3.5 h-3.5 text-slate-400 ml-0.5" />
+            </div>
+
+            {/* Logout Button */}
+            <button
+              type="button"
+              id="topbar-logout-btn"
+              onClick={onLogout}
+              title="Keluar dari akun"
+              className="flex items-center gap-1.5 px-3 py-2 bg-rose-50 hover:bg-rose-100 border border-rose-200 text-rose-700 rounded-xl text-xs font-bold transition-all cursor-pointer active:scale-95"
+            >
+              <LogOut className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">Keluar</span>
             </button>
           </div>
         </header>
@@ -472,91 +442,6 @@ export const Navbar: React.FC<NavbarProps> = ({
           </main>
         </div>
       </div>
-
-      {/* Switch User Modal */}
-      {showSwitchModal && (
-        <div className="fixed inset-0 bg-slate-950/60 backdrop-blur-xs flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-100">
-            <div className="flex items-center justify-between mb-4 pb-3 border-b border-slate-100">
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center">
-                  <Users className="w-4 h-4" />
-                </div>
-                <div>
-                  <h3 className="text-sm font-bold text-slate-900">Ganti Profil Pengguna</h3>
-                  <p className="text-[11px] text-slate-500">Pilih akun untuk mencoba peran yang berbeda</p>
-                </div>
-              </div>
-              <button
-                type="button"
-                onClick={() => setShowSwitchModal(false)}
-                className="p-1 rounded-md text-slate-400 hover:text-slate-600 hover:bg-slate-100"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-
-            <div className="space-y-2 max-h-80 overflow-y-auto pr-1">
-              {availableUsers.map((u) => {
-                const isCurrent = u.id === currentUser.id;
-                const badge = getRoleBadge(u.role);
-                return (
-                  <div
-                    key={u.id}
-                    onClick={() => {
-                      onSwitchUser(u);
-                      setShowSwitchModal(false);
-                    }}
-                    className={`p-3 rounded-xl border cursor-pointer transition-all flex items-center justify-between ${
-                      isCurrent
-                        ? 'border-blue-500 bg-blue-50/70 ring-1 ring-blue-500/30'
-                        : 'border-slate-200 hover:border-slate-300 hover:bg-slate-50'
-                    }`}
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className="w-9 h-9 rounded-full bg-slate-900 text-white flex items-center justify-center font-bold text-xs">
-                        {u.name.slice(0, 2).toUpperCase()}
-                      </div>
-                      <div>
-                        <p className="text-xs font-bold text-slate-900">{u.name}</p>
-                        <p className="text-[11px] text-slate-500">Username: <span className="font-mono">{u.username}</span></p>
-                        <div className="mt-1 flex items-center gap-1.5">
-                          <span className={`inline-flex items-center text-[10px] font-semibold px-2 py-0.5 rounded-md border ${badge.badgeLight}`}>
-                            {badge.icon}
-                            {badge.label}
-                          </span>
-                          {u.assignedClassId && (
-                            <span className="text-[10px] bg-slate-100 text-slate-700 px-1.5 py-0.5 rounded font-medium">
-                              Kelas {u.assignedClassId}
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-
-                    {isCurrent && (
-                      <span className="flex items-center text-xs font-bold text-blue-600 gap-1 bg-white px-2 py-1 rounded-md border border-blue-200">
-                        <CheckCircle2 className="w-3.5 h-3.5" />
-                        Aktif
-                      </span>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-
-            <div className="mt-5 pt-3 border-t border-slate-100 flex justify-end">
-              <button
-                type="button"
-                onClick={() => setShowSwitchModal(false)}
-                className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-lg transition-colors"
-              >
-                Tutup
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 };

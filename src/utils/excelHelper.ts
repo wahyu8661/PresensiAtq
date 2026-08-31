@@ -253,21 +253,21 @@ export const downloadTemplate = (type: 'students' | 'users' | 'attendance') => {
   if (type === 'students') {
     const sampleData = [
       {
-        'NISN': '0098765432',
-        'NIS': '247099',
+        'NISN': '007000001',
+        'NIS': '247I001',
         'Nama Lengkap': 'Ahmad Zaki Mubarak',
         'Jenis Kelamin (L/P)': 'L',
-        'Kode Kelas': '7A',
+        'Kode Kelas': '7-ikhwan',
         'Nama Orang Tua / Wali': 'Bpk. Ridwan Mubarak',
         'No HP Ortu': '081234567890',
         'Status': 'Aktif',
       },
       {
-        'NISN': '0098765433',
-        'NIS': '247100',
+        'NISN': '007000002',
+        'NIS': '247A001',
         'Nama Lengkap': 'Fatimah Az-Zahra',
         'Jenis Kelamin (L/P)': 'P',
-        'Kode Kelas': '7A',
+        'Kode Kelas': '7-akhwat',
         'Nama Orang Tua / Wali': 'Bpk. Sulaiman',
         'No HP Ortu': '081398765432',
         'Status': 'Aktif',
@@ -289,7 +289,7 @@ export const downloadTemplate = (type: 'students' | 'users' | 'attendance') => {
         'No HP': '082199887766',
         'Kode Kelas Binaan (Untuk Wali Kelas)': '',
         'Kode Mapel Diampu (Pisahkan koma)': 'matematika, ipa',
-        'Kode Kelas Diampu (Pisahkan koma)': '7A, 7B, 8A',
+        'Kode Kelas Diampu (Pisahkan koma)': '7-ikhwan, 7-akhwat, 8-akhwat-a',
       },
       {
         'NIP': '198805052015022002',
@@ -299,9 +299,9 @@ export const downloadTemplate = (type: 'students' | 'users' | 'attendance') => {
         'Peran (admin / wali_kelas / guru_mapel)': 'wali_kelas',
         'Email': 'halimah@attaufiq.sch.id',
         'No HP': '081233445566',
-        'Kode Kelas Binaan (Untuk Wali Kelas)': '8A',
+        'Kode Kelas Binaan (Untuk Wali Kelas)': '8-akhwat-a',
         'Kode Mapel Diampu (Pisahkan koma)': 'bahasa_inggris',
-        'Kode Kelas Diampu (Pisahkan koma)': '8A, 8B',
+        'Kode Kelas Diampu (Pisahkan koma)': '8-akhwat-a, 8-akhwat-b',
       },
     ];
     const ws = XLSX.utils.json_to_sheet(sampleData);

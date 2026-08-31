@@ -43,7 +43,7 @@ export const WaliKelasView: React.FC<WaliKelasViewProps> = ({
   const [searchQuery, setSearchQuery] = useState<string>('');
 
   // Target Class for this Homeroom Teacher
-  const targetClassId = currentUser.assignedClassId || '7A';
+  const targetClassId = currentUser.assignedClassId || classes[0]?.id || '7-ikhwan';
   const targetClass = classes.find((c) => c.id === targetClassId);
 
   // Students in this homeroom class

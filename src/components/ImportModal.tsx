@@ -65,7 +65,7 @@ export const ImportModal: React.FC<ImportModalProps> = ({
         nis: String(r['NIS'] || r['nis'] || r['Nis'] || ''),
         name: String(r['Nama Lengkap'] || r['Nama Siswa'] || r['nama'] || r['Nama'] || `Siswa ${i + 1}`).trim(),
         gender: (String(r['Jenis Kelamin (L/P)'] || r['L/P'] || r['gender'] || 'L').toUpperCase().startsWith('P') ? 'P' : 'L') as 'L' | 'P',
-        classId: String(r['Kode Kelas'] || r['Kelas'] || r['classId'] || '7A').trim(),
+        classId: String(r['Kode Kelas'] || r['Kelas'] || r['classId'] || '7-ikhwan').trim(),
         parentName: String(r['Nama Orang Tua / Wali'] || r['Orang Tua'] || r['parentName'] || ''),
         parentPhone: String(r['No HP Ortu'] || r['No. HP Orang Tua'] || r['parentPhone'] || ''),
         status: (r['Status'] || 'Aktif') as any,
